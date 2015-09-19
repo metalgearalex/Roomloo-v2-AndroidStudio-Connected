@@ -7,6 +7,8 @@ import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -26,21 +28,35 @@ public class ListingsFragment extends Fragment {
         //return new ListingsFragment();
             //}
 
+    //creating the toolbar with the Neighborhood and Filter Buttons (i.e. menu)
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+        inflater.inflate(R.menu.toolbar_menu, menu);
+    }
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setHasOptionsMenu(true);
+    }
 
     //As soon as you create your RecyclerView you give it another object called LayoutManager.
     // This is required for it to work otherwise your app crashes.
     // LayoutManager handles the actual positioning of items and also defines the scrolling behavior.
     @Override
     public View onCreateView (LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_listings, container, false);
+        View view = inflater.inflate(R.layout.fragment_listings, container, false); //fragment_listings just contains your RecyclerView
 
         mListingsRecyclerView = (RecyclerView) view.findViewById(R.id.listings_recycler_view);
-        mListingsRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity() ) ); //there are other types of LayoutManagers available too like a GridLayoutManager
+        mListingsRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity())); //there are other types of LayoutManagers available too like a GridLayoutManager
 
         updateUI();
 
         return view;
             }
+
+
 
     private void updateUI() {
         ApartmentInventory apartmentInventory = ApartmentInventory.get(getActivity() );
@@ -57,7 +73,7 @@ public class ListingsFragment extends Fragment {
         public ImageView mListingsThumbnail;
         public Apartment mApartment; //an instance variable for that specific apartment in the list of apartment listings
         public TextView mListingsTextView;
-        public Drawable mListingsDrawableThumbnail;
+
 
 //a method to make it cleaner to set our Text, etc to our adapter in onBindViewHolder
 // (where we pass in the viewholder and its position and the adapter looks up the model data for that position
