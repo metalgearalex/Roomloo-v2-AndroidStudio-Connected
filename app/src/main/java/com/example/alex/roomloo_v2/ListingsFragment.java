@@ -1,7 +1,7 @@
 package com.example.alex.roomloo_v2;
 
 import android.content.Intent;
-import android.graphics.drawable.Drawable;
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
@@ -14,6 +14,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import java.io.ByteArrayOutputStream;
 import java.util.List;
 
 /**
@@ -73,6 +74,8 @@ public class ListingsFragment extends Fragment {
         public ImageView mListingsThumbnail;
         public Apartment mApartment; //an instance variable for that specific apartment in the list of apartment listings
         public TextView mListingsTextView;
+        Bitmap mOriginalImage_Listings;
+        ByteArrayOutputStream mOutputStream_Listings;
 
 
 //a method to make it cleaner to set our Text, etc to our adapter in onBindViewHolder
@@ -83,12 +86,22 @@ public class ListingsFragment extends Fragment {
             mApartment = apartment;
 
             mListingsTextView.setText(mApartment.getApartmentText() );
-            //doing the same thing here as above but trying to account for the ImageView / Drawable issue
-            Drawable placeholderDrawable = getResources().getDrawable(R.drawable.test_image1); //see pg 431
-            mListingsThumbnail.setImageDrawable(placeholderDrawable);//
+
+            //doing the same thing here as above but trying to account for the ImageView / Drawable issue and also trying to compress the image
+            mListingsThumbnail.setImageBitmap(PictureCompression.decodeSampledBitmapFromResource(getResources(), R.drawable.livingroom, 100, 100));
+
+            //one approach for compression, no compile errors so code seems right but still resulted in an "OutOfMemoryError"
+                //mOriginalImage_Listings = BitmapFactory.decodeResource(getResources(), R.drawable.livingroom);
+                //mOutputStream_Listings = new ByteArrayOutputStream();
+                //mOriginalImage_Listings.compress(Bitmap.CompressFormat.JPEG, 0, mOutputStream_Listings); //png may be lossless tho?
+                // mListingsThumbnail.setImageBitmap(mOriginalImage_Listings);
+
+            //old solution
+            // Drawable placeholderDrawable = getResources().getDrawable(R.drawable.test_image1); //see pg 431
+            //mListingsThumbnail.setImageDrawable(placeholderDrawable);//
                 }
 
-
+//see page 191
         public ListingsHolder (View view) {
             super(view);
             mListingsThumbnail = (ImageView) view.findViewById(R.id.list_item_apartment_picture);

@@ -11,7 +11,7 @@
         android:id="@+id/details_page_apartment_picture"
         android:layout_width="match_parent"
         android:layout_height="100dp"
-        android:src="@drawable/test_image1"
+
         />
 
     <TextView
