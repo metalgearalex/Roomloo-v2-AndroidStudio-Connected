@@ -88,6 +88,7 @@ public class ListingsFragment extends Fragment {
             mListingsTextView.setText(mApartment.getApartmentText() );
 
             //doing the same thing here as above but trying to account for the ImageView / Drawable issue and also trying to compress the image
+            //100,100 is where we finally define the required height and width and we're basically saying display a 100 x 100 pixel thumbnail
             mListingsThumbnail.setImageBitmap(PictureCompression.decodeSampledBitmapFromResource(getResources(), R.drawable.livingroom, 100, 100));
 
             //one approach for compression, no compile errors so code seems right but still resulted in an "OutOfMemoryError"

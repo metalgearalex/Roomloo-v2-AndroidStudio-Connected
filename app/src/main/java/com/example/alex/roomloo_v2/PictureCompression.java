@@ -22,6 +22,7 @@ public class PictureCompression {
 //inSampleSize is a method of BitmapFactory.Options that determines how big each sample should be for each pixel;
 // a sample size of 2 has one horizontal pixel for every 2 horizontal pixels in the original file
 // so a sample size of 2 has 1/4 as many pixels as the original
+//note we give the reqWidth and reqHeight a real value when we call the decodeSampledBitmapFromResource method below
         int inSampleSize = 2;
 
         if (height > reqHeight || width > reqWidth) {
@@ -39,10 +40,11 @@ public class PictureCompression {
 
         return inSampleSize;
             }
-
+    //note we give the reqWidth and reqHeight a real value when we call the method. for example a 100 x 100 pixel thumbnail
     public static Bitmap decodeSampledBitmapFromResource(Resources res, int resId, int reqWidth, int reqHeight) {
 
         // First decode with inJustDecodeBounds=true to check dimensions
+        //Android's BitmapFactory class provides several decoding methods (decodeByteArray(), decodeFile(),decodeResource(), etc.) for creating a Bitmap from various sources.
         final BitmapFactory.Options options = new BitmapFactory.Options();
         options.inJustDecodeBounds = true;
         BitmapFactory.decodeResource(res, resId, options);
@@ -63,6 +65,11 @@ public class PictureCompression {
 
 //the stuff below is from the book and is more geared for scaling down a Bitmap we get from an external file.
 // NOT CURRENTLY USING THIS but will probably be useful later when I pull Images from the database
+
+
+
+
+
 
     //conservative scale method to check to see how big the screen is
     //and then scale the image down to that size

@@ -3,7 +3,6 @@
 package com.example.alex.roomloo_v2;
 
 
-import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -11,9 +10,14 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
-import java.io.ByteArrayOutputStream;
-import java.io.File;
+import com.facebook.CallbackManager;
+import com.facebook.FacebookCallback;
+import com.facebook.FacebookException;
+import com.facebook.login.LoginResult;
+import com.facebook.login.widget.LoginButton;
+
 import java.util.UUID;
 
 /**
@@ -25,10 +29,15 @@ public class ApartmentFragment extends Fragment {
     private static final String ARG_APARTMENT_ID = "apartment_id";
     private ImageView mApartmentImageView;
     private TextView mApartmentTextView;
-    private File mPhotoFile; //to store / point to the photo's location? used to convert into bitmap?
-    Bitmap mOriginalImage; //to try and compress the photo?
-    Bitmap mCompressedImage; //to try and compress the photo?
-    ByteArrayOutputStream mOutputStream; //to try and compress the photo?
+    private LoginButton mFbLoginButton;
+
+
+
+    //old attempts at trying to compress photos. Not used, delete once pulling and compressing from database
+    // private File mPhotoFile; //to store / point to the photo's location? used to convert into bitmap?
+    //Bitmap mOriginalImage; //to try and compress the photo?
+    //Bitmap mCompressedImage; //to try and compress the photo?
+    //ByteArrayOutputStream mOutputStream; //to try and compress the photo?
 
     //to retrieve an extra (i.e. which apartment is this that we're showing?)
     //basically stashing the data(apartment's id) in its arguments bundle
@@ -47,6 +56,7 @@ public class ApartmentFragment extends Fragment {
         super.onCreate(savedInstanceState);
         UUID apartmentId = (UUID) getArguments().getSerializable(ARG_APARTMENT_ID);
         mApartment = ApartmentInventory.get(getActivity() ).getApartment(apartmentId);//former code that worked to pull up the view of one un-specific apartment --> mApartment = new Apartment();
+
         //this might be another possibility but setContentView requires us to extend AppCompatActivity >> setContentView(R.layout.apartment_details_page);
             }
 
@@ -76,6 +86,34 @@ public class ApartmentFragment extends Fragment {
         //trying to get a compressed image to show up
         mApartmentImageView = (ImageView) v.findViewById(R.id.details_page_apartment_picture);
         mApartmentImageView.setImageBitmap(PictureCompression.decodeSampledBitmapFromResource(getResources(), R.drawable.livingroom, 100, 100));
+
+        //FB log-in button
+        mFbLoginButton = (LoginButton) v.findViewById(R.id.login_button);
+        mFbLoginButton.setReadPermissions("user_friends"); //look into this more and what this does and what else we can pull
+        mFbLoginButton.setFragment(this); //this is a reference to your current fragment
+
+        // Other app specific specialization
+
+        // Callback registration
+        //note callbackManager is defined in onCreate
+        //The CallbackManager manages the callbacks into the FacebookSdk from an Activity's or Fragment's onActivityResult() method.
+        //registerCallback is a public method of FB's LoginButton and registers a login callback to the given callback manager.
+        mFbLoginButton.registerCallback(CallbackManager.Factory.create(), new FacebookCallback<LoginResult>() {
+            @Override
+            public void onSuccess(LoginResult loginResult) {
+                Toast.makeText(getActivity(), "Success", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onCancel() {
+                Toast.makeText(getActivity(),"fail",Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onError(FacebookException exception) {
+                Toast.makeText(getActivity(),"error", Toast.LENGTH_SHORT).show();
+            }
+        });
 
         //one approach for compression, no compile errors so code seems right but still resulted in an "OutOfMemoryError"
             //mOriginalImage = BitmapFactory.decodeResource(getResources(), R.drawable.livingroom);
