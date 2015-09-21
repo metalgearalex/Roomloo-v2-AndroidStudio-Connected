@@ -107,12 +107,12 @@ public class ApartmentFragment extends Fragment {
             @Override
             public void onCancel() {
                 Toast.makeText(getActivity(),"fail",Toast.LENGTH_SHORT).show();
-            }
+                    }
 
             @Override
             public void onError(FacebookException exception) {
                 Toast.makeText(getActivity(),"error", Toast.LENGTH_SHORT).show();
-            }
+                    }
         });
 
         //one approach for compression, no compile errors so code seems right but still resulted in an "OutOfMemoryError"
