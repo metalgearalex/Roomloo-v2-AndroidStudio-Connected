@@ -6,6 +6,7 @@ package com.example.alex.roomloo_v2;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -132,7 +133,7 @@ public class ApartmentFragment extends Fragment {
         mFbLoginButton.setReadPermissions("user_friends"); //look into this more and what this does and what else we can pull
         mFbLoginButton.setFragment(this); //this is a reference to your current fragment
 
-        // Other app specific specialization
+        // FB Profile Picture
         mFbProfilePicture = (ImageView) v.findViewById(R.id.fbuserImage);
 
         // Callback registration
@@ -149,33 +150,10 @@ public class ApartmentFragment extends Fragment {
                 Toast.makeText(getActivity(), "Success", Toast.LENGTH_SHORT).show();
                 AccessToken accessToken = loginResult.getAccessToken(); //getAccessToken is an instance method that returns the new access Token
                 Profile profile = Profile.getCurrentProfile(); //see the Profile documentation
-
-
-                //trying to get FB profile picture to show up
-                //Reminder: Try = some code that could throw an exception
-                // Reminder: Catch = the code in here is called if that exception occurs
-
-
-                try {
-                    URL img_value = null;
-                    String fbProfileId = profile.getId();
-                    img_value = new URL("http://graph.facebook.com/"+fbProfileId+"/picture?type=large");
-                    Bitmap mIcon1 = BitmapFactory.decodeStream(img_value.openConnection().getInputStream());
-                    mFbProfilePicture.setImageBitmap(mIcon1);
-                    //other attempts:
-                    //doesn't give an error tho overall app is crashing, not sure why >> mFbProfilePicture.setProfileId(fbProfileId);
-                    //one stackoverflow solution but gives me an error: mFbProfilePicture.setImageBitmap(mIcon1);
-                            }
-//catches here because otherwise URL line and Bitmap line produce errors
-                catch (MalformedURLException e){
-                    System.out.println("Error: " + e.getMessage() );
-                    e.printStackTrace();
-                            }
-                catch (IOException ioe){
-                    System.out.println("Error: " + ioe.getMessage() );
-                    ioe.printStackTrace();
-                            }
+                new fetchFbProfilePic().execute();
                     }//end of onSuccess method
+
+
 
             @Override
             public void onCancel() {
@@ -222,5 +200,44 @@ public class ApartmentFragment extends Fragment {
         mCallbackManager.onActivityResult(requestCode, resultCode, data);
             }
 
+
+    //this class is executed in the onSuccess method
+    private class fetchFbProfilePic extends AsyncTask <ImageView, Void, Bitmap> {
+
+        @Override
+        protected Bitmap doInBackground(ImageView... params) {
+            //trying to get FB profile picture to show up
+            //Reminder: Try = some code that could throw an exception
+            // Reminder: Catch = the code in here is called if that exception occurs
+            try {
+                URL img_value = null;
+                Profile profile = Profile.getCurrentProfile();
+                String fbProfileId = profile.getId();
+                img_value = new URL("http://graph.facebook.com/"+fbProfileId+"/picture?type=large");
+                Bitmap mIcon1 = BitmapFactory.decodeStream(img_value.openConnection().getInputStream());
+
+            }
+            //catches here because otherwise URL line and Bitmap line produce errors
+            catch (MalformedURLException e){
+                System.out.println("Error: " + e.getMessage() );
+                e.printStackTrace();
+                    }
+            catch (IOException ioe){
+                System.out.println("Error: " + ioe.getMessage() );
+                ioe.printStackTrace();
+                    }
+            return null;
+        } //end of doInBackground
+
+        @Override
+        protected void onPostExecute (Bitmap mIcon1) {
+            mFbProfilePicture.setImageBitmap(mIcon1);
+                }
+        //other attempts:
+        //doesn't give an error tho overall app is crashing, not sure why >> mFbProfilePicture.setProfileId(fbProfileId);
+        //mFbProfilePicture.setImageBitmap(mIcon1);
+
+    } //end of fetchFbProfilePic
+    
 
 }
