@@ -3,6 +3,7 @@
 package com.example.alex.roomloo_v2;
 
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -12,9 +13,14 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.facebook.AccessToken;
+import com.facebook.AccessTokenTracker;
 import com.facebook.CallbackManager;
 import com.facebook.FacebookCallback;
 import com.facebook.FacebookException;
+import com.facebook.FacebookSdk;
+import com.facebook.Profile;
+import com.facebook.ProfileTracker;
 import com.facebook.login.LoginResult;
 import com.facebook.login.widget.LoginButton;
 
@@ -30,8 +36,9 @@ public class ApartmentFragment extends Fragment {
     private ImageView mApartmentImageView;
     private TextView mApartmentTextView;
     private LoginButton mFbLoginButton;
-
-
+    private CallbackManager mCallbackManager;
+    private AccessTokenTracker mAccessTokenTracker;
+    private ProfileTracker mProfileTracker;
 
     //old attempts at trying to compress photos. Not used, delete once pulling and compressing from database
     // private File mPhotoFile; //to store / point to the photo's location? used to convert into bitmap?
@@ -56,9 +63,36 @@ public class ApartmentFragment extends Fragment {
         super.onCreate(savedInstanceState);
         UUID apartmentId = (UUID) getArguments().getSerializable(ARG_APARTMENT_ID);
         mApartment = ApartmentInventory.get(getActivity() ).getApartment(apartmentId);//former code that worked to pull up the view of one un-specific apartment --> mApartment = new Apartment();
+        mCallbackManager = CallbackManager.Factory.create();
+
+//originally was getContext() but that didn't work here. getActivity returns the activity associated with a fragment and the Activity is a context since Activity extends Context
+        //remember, Activity is a context since Activity extends Context
+        FacebookSdk.sdkInitialize(getActivity() );
+
+        mCallbackManager = CallbackManager.Factory.create();
+        //AccessTokenTracker is meant to track if your app has a new acess token for that user
+        //seems like we can and probably should move all of this to the fragment's onCreate method tho?
+        mAccessTokenTracker = new AccessTokenTracker() {
+            @Override
+            protected void onCurrentAccessTokenChanged(AccessToken oldAccessToken, AccessToken currentAccessToken) {
+            }
+
+        };
+        //ProfileTracker track's if user's changed their profile picture etc
+        mProfileTracker = new ProfileTracker() {
+            @Override
+            protected void onCurrentProfileChanged(Profile oldProfile, Profile currentProfile) {
+
+            }
+        };
+        //to actually use the methods above
+        mAccessTokenTracker.startTracking();
+        mProfileTracker.startTracking();
+
+    }
+
 
         //this might be another possibility but setContentView requires us to extend AppCompatActivity >> setContentView(R.layout.apartment_details_page);
-            }
 
         //to use our PictureCompression class
         //private void updatePhotoView() {
@@ -98,20 +132,27 @@ public class ApartmentFragment extends Fragment {
         //note callbackManager is defined in onCreate
         //The CallbackManager manages the callbacks into the FacebookSdk from an Activity's or Fragment's onActivityResult() method.
         //registerCallback is a public method of FB's LoginButton and registers a login callback to the given callback manager.
-        mFbLoginButton.registerCallback(CallbackManager.Factory.create(), new FacebookCallback<LoginResult>() {
+
+        mFbLoginButton.registerCallback(mCallbackManager, new FacebookCallback<LoginResult>() {
+            ////Using a FB SDK FacebookCallback class, the onSuccess, etc etc is pre-generated for you when you write the first line
+            //LoginResult is a FB interface that shows the results of a log in operation
+            //see LoginResult documentation for the methods you can use to get acesstoken, permissions, etc
             @Override
             public void onSuccess(LoginResult loginResult) {
                 Toast.makeText(getActivity(), "Success", Toast.LENGTH_SHORT).show();
-            }
+                AccessToken accessToken = loginResult.getAccessToken(); //getAccessToken is an instance method that returns the new access Token
+                Profile profile = Profile.getCurrentProfile(); //see the Profile documentation
+                //saying this can't do this from a static context? >> Uri profilePicture = Profile.getProfilePictureUri(10, 10);
+                    }
 
             @Override
             public void onCancel() {
-                Toast.makeText(getActivity(),"fail",Toast.LENGTH_SHORT).show();
+                Toast.makeText(getActivity(),"Hmm.. please log-in so you can schedule a viewing or shoot us an email",Toast.LENGTH_SHORT).show();
                     }
 
             @Override
             public void onError(FacebookException exception) {
-                Toast.makeText(getActivity(),"error", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getActivity(),"Sorry, something seems to have gone wrong with your log-in attempt", Toast.LENGTH_SHORT).show();
                     }
         });
 
@@ -134,6 +175,20 @@ public class ApartmentFragment extends Fragment {
 
         return v;
     }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        mAccessTokenTracker.stopTracking();
+        mProfileTracker.stopTracking();
+            }
+
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        mCallbackManager.onActivityResult(requestCode, resultCode, data);
+            }
 
 
 }
