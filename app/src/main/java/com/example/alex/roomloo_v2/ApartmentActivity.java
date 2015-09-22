@@ -4,15 +4,8 @@ package com.example.alex.roomloo_v2;
 
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageInfo;
-import android.content.pm.PackageManager;
-import android.content.pm.Signature;
 import android.support.v4.app.Fragment;
-import android.util.Base64;
-import android.util.Log;
 
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.util.UUID;
 
 /**
@@ -36,6 +29,7 @@ public class ApartmentActivity extends SingleFragmentActivity {
         return intent;
             }
 
+
 //creating your view by showing your fragment
 //could just be return new ApartmentFragment();
 // but to call the exact Apartment the user clicked on we're calling ApartmentFragment.newInstance(UUID) (i.e. the newInstance method defined in ApartmentFragment
@@ -50,40 +44,6 @@ public class ApartmentActivity extends SingleFragmentActivity {
 
             }
 
-    /**
-     * generates key hash for facebbok
-     */
-    private void GetKeyHash()
-    {
 
-        PackageInfo info;
-        try
-        {
-            info = getPackageManager().getPackageInfo(getPackageName(), PackageManager.GET_SIGNATURES);
-            for (Signature signature : info.signatures)
-            {
-                MessageDigest md;
-                md = MessageDigest.getInstance("SHA");
-                md.update(signature.toByteArray());
-                String keyhash = new String(Base64.encode(md.digest(), 0));
-                // String something = new String(Base64.encodeBytes(md.digest()));
-                Log.e("keyhash", "keyhash= " + keyhash);
-                System.out.println("keyhash= " + keyhash);
-            }
-        }
-        catch (PackageManager.NameNotFoundException e1)
-        {
-            Log.e("name not found", e1.toString());
-        }
-        catch (NoSuchAlgorithmException e)
-        {
-            Log.e("no such an algorithm", e.toString());
-        }
-        catch (Exception e)
-        {
-            Log.e("exception", e.toString());
-        }
-
-    }
 
 }

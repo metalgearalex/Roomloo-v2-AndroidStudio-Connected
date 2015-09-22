@@ -4,6 +4,8 @@ package com.example.alex.roomloo_v2;
 
 
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -24,6 +26,9 @@ import com.facebook.ProfileTracker;
 import com.facebook.login.LoginResult;
 import com.facebook.login.widget.LoginButton;
 
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.UUID;
 
 /**
@@ -39,6 +44,7 @@ public class ApartmentFragment extends Fragment {
     private CallbackManager mCallbackManager;
     private AccessTokenTracker mAccessTokenTracker;
     private ProfileTracker mProfileTracker;
+    private ImageView mFbProfilePicture;
 
     //old attempts at trying to compress photos. Not used, delete once pulling and compressing from database
     // private File mPhotoFile; //to store / point to the photo's location? used to convert into bitmap?
@@ -127,6 +133,7 @@ public class ApartmentFragment extends Fragment {
         mFbLoginButton.setFragment(this); //this is a reference to your current fragment
 
         // Other app specific specialization
+        mFbProfilePicture = (ImageView) v.findViewById(R.id.fbuserImage);
 
         // Callback registration
         //note callbackManager is defined in onCreate
@@ -142,19 +149,44 @@ public class ApartmentFragment extends Fragment {
                 Toast.makeText(getActivity(), "Success", Toast.LENGTH_SHORT).show();
                 AccessToken accessToken = loginResult.getAccessToken(); //getAccessToken is an instance method that returns the new access Token
                 Profile profile = Profile.getCurrentProfile(); //see the Profile documentation
-                //saying this can't do this from a static context? >> Uri profilePicture = Profile.getProfilePictureUri(10, 10);
-                    }
+
+
+                //trying to get FB profile picture to show up
+                //Reminder: Try = some code that could throw an exception
+                // Reminder: Catch = the code in here is called if that exception occurs
+
+
+                try {
+                    URL img_value = null;
+                    String fbProfileId = profile.getId();
+                    img_value = new URL("http://graph.facebook.com/"+fbProfileId+"/picture?type=large");
+                    Bitmap mIcon1 = BitmapFactory.decodeStream(img_value.openConnection().getInputStream());
+                    mFbProfilePicture.setImageBitmap(mIcon1);
+                    //other attempts:
+                    //doesn't give an error tho overall app is crashing, not sure why >> mFbProfilePicture.setProfileId(fbProfileId);
+                    //one stackoverflow solution but gives me an error: mFbProfilePicture.setImageBitmap(mIcon1);
+                            }
+//catches here because otherwise URL line and Bitmap line produce errors
+                catch (MalformedURLException e){
+                    System.out.println("Error: " + e.getMessage() );
+                    e.printStackTrace();
+                            }
+                catch (IOException ioe){
+                    System.out.println("Error: " + ioe.getMessage() );
+                    ioe.printStackTrace();
+                            }
+                    }//end of onSuccess method
 
             @Override
             public void onCancel() {
-                Toast.makeText(getActivity(),"Hmm.. please log-in so you can schedule a viewing or shoot us an email",Toast.LENGTH_SHORT).show();
+                Toast.makeText(getActivity(),"Please log-in so you can schedule a viewing or shoot us an email",Toast.LENGTH_SHORT).show();
                     }
 
             @Override
             public void onError(FacebookException exception) {
                 Toast.makeText(getActivity(),"Sorry, something seems to have gone wrong with your log-in attempt", Toast.LENGTH_SHORT).show();
                     }
-        });
+        });//end of register callback method
 
         //one approach for compression, no compile errors so code seems right but still resulted in an "OutOfMemoryError"
             //mOriginalImage = BitmapFactory.decodeResource(getResources(), R.drawable.livingroom);
