@@ -25,6 +25,7 @@ public class TimePickerFragment extends DialogFragment {
     public static final String EXTRA_TIME = "com.roomloo.android.time"; //does the actual name here matter?
 
     //to enable you to pass the Date from your ScheduleViewingFragment to your DatePickerFragment
+    //may be able to delete this?
     public static TimePickerFragment newInstance(Date date) {
         Bundle args = new Bundle();
         args.putSerializable(ARG_TIME, date);
@@ -36,23 +37,29 @@ public class TimePickerFragment extends DialogFragment {
 
     //overriding a method from the DialogFragment class
     //builds an AlertDialog with a title and one OK button
-    //see pg 219
+    //here you're just initializing the DatePicker. the book is set up so that it gets the Date from CrimeFragment. Here this is not going to happen so just set it to today's date
+    //see pg 219, 226
     @Override
     public Dialog onCreateDialog (Bundle savedInstanceState) {
         //creating a Calendar since Date is more of a timestamp
-        Date date = (Date) getArguments().getSerializable(ARG_TIME);
 
-        Calendar calendar = Calendar.getInstance();
-        calendar.setTime(date);
-        int hour = calendar.get(Calendar.HOUR);
-        int minute = calendar.get(Calendar.MINUTE);
+        Calendar calendar=Calendar.getInstance(); //returns a new Gregorian Calendar.
+        //NOTE: a new Gregorian Calendar constructor with no parameters is automatically initialized to the current date and time with the default Locale and TimeZone
+
+        //commenting out prior code since no other fragment knows anything about a date so there's nothing to pass to here
+        //Date date = (Date) getArguments().getSerializable(ARG_TIME);
+
+        //Calendar calendar = Calendar.getInstance();
+        //calendar.setTime(date);
+        //int hour = calendar.get(Calendar.HOUR);
+        //int minute = calendar.get(Calendar.MINUTE);
 
         //inflating the actual dialog when you click the schedule Date button in your Schedule Viewing Page
         View v= LayoutInflater.from(getActivity() ).inflate(R.layout.dialog_time, null);
 
         //using our new calendar
         mTimePicker = (TimePicker) v.findViewById(R.id.dialog_time_time_picker);
-        //no way to initialize the state like we do with DatePicker? mTimePicker.init(year, month, day, null);
+
 
         return new AlertDialog.Builder(getActivity() )
                 .setView(v)

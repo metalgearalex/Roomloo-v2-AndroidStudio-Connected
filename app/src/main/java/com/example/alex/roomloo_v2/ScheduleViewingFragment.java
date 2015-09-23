@@ -5,12 +5,13 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
+import android.text.format.DateFormat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 
-import java.sql.Date;
+import java.util.Date;
 import java.util.UUID;
 
 /**
@@ -74,7 +75,7 @@ public class ScheduleViewingFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 FragmentManager manager = getFragmentManager();
-                DatePickerFragment dialog = DatePickerFragment.newInstance(mApartment.getDate() ); //former code DatePickerFragment dialog = new DatePickerFragment(); however new code allows us to pass date to DatePickerFragment
+                TimePickerFragment dialog = TimePickerFragment.newInstance(mApartment.getDate() ); //former code DatePickerFragment dialog = new DatePickerFragment(); however new code allows us to pass date to DatePickerFragment
                 dialog.setTargetFragment(ScheduleViewingFragment.this, REQUEST_TIME);
                 dialog.show(manager, DIALOG_TIME); //displays the Dialog, /parameters = FragmentManager, String TAG
             }
@@ -94,13 +95,13 @@ public class ScheduleViewingFragment extends Fragment {
         else if (requestCode == REQUEST_DATE) {
             Date date = (Date) data.getSerializableExtra(DatePickerFragment.EXTRA_DATE);
             mApartment.setDate(date);
-            mDateButton.setText(mApartment.getDate().toString() );
+            mDateButton.setText(DateFormat.format("EEEE, MMMM d, yyyyy", mApartment.getDate())); //former code that works, just trying to reformat >> mDateButton.setText(mApartment.getDate().toString() );
                 }
 
         else if (requestCode == REQUEST_TIME) {
             Date date = (Date) data.getSerializableExtra(TimePickerFragment.EXTRA_TIME);
             mApartment.setDate(date);
-            mTimeButton.setText(mApartment.getDate().toString() );
+            mTimeButton.setText(DateFormat.format("h:mm a", mApartment.getDate()) ); //works but just wanted to reformat what the button shows after you set the time of your viewing>>  mTimeButton.setText(mApartment.getDate().toString() );
         }
 
     }

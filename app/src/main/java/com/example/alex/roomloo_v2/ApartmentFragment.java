@@ -99,7 +99,7 @@ public class ApartmentFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.apartment_details_page, container, false);
         mApartmentTextView = (TextView) v.findViewById(R.id.details_page_apartment_text);
-        mApartmentTextView.setText(mApartment.getApartmentText()); //is this right?
+        mApartmentTextView.setText(mApartment.getApartmentText()); //yes this works and is necessary to show the apartment text on the specific-apartment-view's page. Oddly enough, sometimes Android gets a nullpointerexception with this line, if you get it just temporarily comment out this line so you  can see what the real error is
 
         //trying to get a compressed image to show up
         mApartmentImageView = (ImageView) v.findViewById(R.id.details_page_apartment_picture);
