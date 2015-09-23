@@ -9,6 +9,7 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -39,13 +40,9 @@ public class ApartmentFragment extends Fragment {
     private CallbackManager mCallbackManager;
     private AccessTokenTracker mAccessTokenTracker;
     private ProfileTracker mProfileTracker;
+    private Button mScheduleButton;
 
 
-    //old attempts at trying to compress photos. Not used, delete once pulling and compressing from database
-    // private File mPhotoFile; //to store / point to the photo's location? used to convert into bitmap?
-    //Bitmap mOriginalImage; //to try and compress the photo?
-    //Bitmap mCompressedImage; //to try and compress the photo?
-    //ByteArrayOutputStream mOutputStream; //to try and compress the photo?
 
     //to retrieve an extra (i.e. which apartment is this that we're showing?)
     //basically stashing the data(apartment's id) in its arguments bundle
@@ -93,20 +90,6 @@ public class ApartmentFragment extends Fragment {
     }
 
 
-        //this might be another possibility but setContentView requires us to extend AppCompatActivity >> setContentView(R.layout.apartment_details_page);
-
-        //to use our PictureCompression class
-        //private void updatePhotoView() {
-            //if (mApartmentImageView == null) {
-                //mApartmentImageView.setImageDrawable(null);
-                    //}
-            //else {
-                //Bitmap bitmap = PictureCompression.getScaledBitmap(getResources(R.drawable.livingroom) );
-                //mApartmentImageView.setImageBitmap(bitmap);
-                //another option?BitmapFactory.decodeResource(Context.getResources(), R.drawable.livingroom);
-                    //}
-        //}
-
 
 //to explicitly inflate the fragment's view. basically just calling LayoutInflater.inflate(....) and passing in the layout resource ID
 //second parameter is your view's parent, usually needed to configure widgets properly
@@ -121,6 +104,21 @@ public class ApartmentFragment extends Fragment {
         //trying to get a compressed image to show up
         mApartmentImageView = (ImageView) v.findViewById(R.id.details_page_apartment_picture);
         mApartmentImageView.setImageBitmap(PictureCompression.decodeSampledBitmapFromResource(getResources(), R.drawable.livingroom, 100, 100));
+
+        //Getting a schedule Button to show up and hooked-up
+        mScheduleButton = (Button) v.findViewById(R.id.schedule_button);
+
+        //pulling up our scheduleview page upon a click of the schedule button
+        //reminder getActivity is a method defined in the Android Activity class (same with onCreate etc etc)
+        //here we're starting an activity from a fragment using an explicit intent and then calling Fragment.startActivity(intent)
+        //specifically we're calling the right apartment to show by calling the newIntent method we defined in ApartmentActivity and getting Id from our Apartment model layer as well
+        mScheduleButton.setOnClickListener(new View.OnClickListener() {
+             @Override
+                public void onClick(View v) {
+                 Intent intent = ScheduleViewingActivity.newIntent(getActivity(), mApartment.getId());
+                 startActivity(intent);
+                    }
+        });
 
         //FB log-in button
         mFbLoginButton = (LoginButton) v.findViewById(R.id.login_button);
@@ -193,3 +191,24 @@ public class ApartmentFragment extends Fragment {
 //former code to get Image to show up in list-view
 //mApartmentImageView = (ImageView) v.findViewById(R.id.details_page_apartment_picture);
 //mApartmentImageView.setImageDrawable(getResources().getDrawable(R.drawable.test_image1) );
+
+
+//this might be another possibility but setContentView requires us to extend AppCompatActivity >> setContentView(R.layout.apartment_details_page);
+
+//to use our PictureCompression class
+//private void updatePhotoView() {
+//if (mApartmentImageView == null) {
+//mApartmentImageView.setImageDrawable(null);
+//}
+//else {
+//Bitmap bitmap = PictureCompression.getScaledBitmap(getResources(R.drawable.livingroom) );
+//mApartmentImageView.setImageBitmap(bitmap);
+//another option?BitmapFactory.decodeResource(Context.getResources(), R.drawable.livingroom);
+//}
+//}
+
+//old attempts at trying to compress photos. Not used, delete once pulling and compressing from database
+// private File mPhotoFile; //to store / point to the photo's location? used to convert into bitmap?
+//Bitmap mOriginalImage; //to try and compress the photo?
+//Bitmap mCompressedImage; //to try and compress the photo?
+//ByteArrayOutputStream mOutputStream; //to try and compress the photo?

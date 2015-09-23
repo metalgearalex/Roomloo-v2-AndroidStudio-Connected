@@ -14,7 +14,15 @@
         android:layout_gravity="center_horizontal"
         android:layout_marginTop="30dp"
         android:layout_marginBottom="30dp"
+
         />
+
+    <Button
+        android:id="@+id/schedule_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toRightOf="@id/login_button"
+        android:text="@string/schedule_viewing"/>
 
     <ImageView
         android:id="@+id/details_page_apartment_picture"
@@ -27,7 +35,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@id/details_page_apartment_picture"
-        tools:text="Apartment Text"/>
+        />
 
 
 
