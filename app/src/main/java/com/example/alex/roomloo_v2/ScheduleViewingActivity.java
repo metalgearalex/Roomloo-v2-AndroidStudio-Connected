@@ -27,11 +27,15 @@ public class ScheduleViewingActivity extends SingleFragmentActivity {
         return intent;
     }
 
-
+    //to just bring up the ScheduleViewingFragment it's return new ScheduleViewingFragment();
+    //however, code below allows us to pull up the schedule viewer for that specific apartment
+    //essentially calling ScheduleViewingFragment.newInstance(UUID)
     @Override
     protected Fragment createFragment() {
-        return new ScheduleViewingFragment();
-    }
+        UUID apartmentId = (UUID) getIntent().getSerializableExtra(EXTRA_APARTMENT_ID);
+        return ScheduleViewingFragment.newInstance(apartmentId);
+                }
+
 
 
 }

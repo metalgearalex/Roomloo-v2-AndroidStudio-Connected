@@ -2,6 +2,7 @@
 
 package com.example.alex.roomloo_v2;
 
+import java.util.Date;
 import java.util.UUID;
 
 /**
@@ -10,6 +11,7 @@ import java.util.UUID;
 public class Apartment {
     private UUID mId;
     private String mApartmentText;
+    private Date mDate;
     //perhaps we need a photoTitle to get the right picture?
     // in CriminalIntent we did:
         // public String getPhotoFilename() {
@@ -37,5 +39,14 @@ public class Apartment {
     public void setApartmentText(String apartmentText) {
         mApartmentText = apartmentText;
     }
+
+    public Date getDate() {
+        return mDate;
+    }
+
+    public void setDate(Date date) {
+        mDate = date;
+    }
+
 }
 

@@ -114,6 +114,7 @@ public class ListingsFragment extends Fragment {
         //reminder getActivity is a method defined in the Android Activity class (same with onCreate etc etc)
         //here we're starting an activity from a fragment using an explicit intent and then calling Fragment.startActivity(intent)
         //specifically we're calling the right apartment to show by calling the newIntent method we defined in ApartmentActivity and getting Id from our Apartment model layer as well
+        //this is where the key-value pair from ApartmentActivity actually gets a real value (i.e. an actual apartment Id)
         @Override
         public void onClick(View v) {
             Intent intent = ApartmentActivity.newIntent(getActivity(), mApartment.getId());

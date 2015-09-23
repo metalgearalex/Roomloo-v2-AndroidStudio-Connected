@@ -111,7 +111,7 @@ public class ApartmentFragment extends Fragment {
         //pulling up our scheduleview page upon a click of the schedule button
         //reminder getActivity is a method defined in the Android Activity class (same with onCreate etc etc)
         //here we're starting an activity from a fragment using an explicit intent and then calling Fragment.startActivity(intent)
-        //specifically we're calling the right apartment to show by calling the newIntent method we defined in ApartmentActivity and getting Id from our Apartment model layer as well
+        //specifically we're calling the right apartment to show by calling the newIntent method we defined in ScheduleViewingActivity and getting Id from our Apartment model layer as well
         mScheduleButton.setOnClickListener(new View.OnClickListener() {
              @Override
                 public void onClick(View v) {

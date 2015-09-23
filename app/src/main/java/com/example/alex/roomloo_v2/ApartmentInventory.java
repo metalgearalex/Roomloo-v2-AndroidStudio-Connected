@@ -17,7 +17,7 @@ public class ApartmentInventory {
     private static ApartmentInventory sApartmentInventory; //a singleton, i.e. a class that allows only one instance of itself to be created
     private List<Apartment> mApartmentList;
 
-    //to create a singleton you create a calss with a private constructor and a get method,
+    //to create a singleton you create a class with a private constructor and a get method,
     // if the instance already exists then get() simply returns the instance
     //see page 169
     public static ApartmentInventory get(Context context) {
