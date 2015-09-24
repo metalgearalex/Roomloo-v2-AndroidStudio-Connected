@@ -41,6 +41,7 @@ public class ApartmentFragment extends Fragment {
     private AccessTokenTracker mAccessTokenTracker;
     private ProfileTracker mProfileTracker;
     private Button mScheduleButton;
+    private AccessToken mAccessToken;
 
 
 
@@ -61,25 +62,51 @@ public class ApartmentFragment extends Fragment {
         super.onCreate(savedInstanceState);
         UUID apartmentId = (UUID) getArguments().getSerializable(ARG_APARTMENT_ID);
         mApartment = ApartmentInventory.get(getActivity() ).getApartment(apartmentId);//former code that worked to pull up the view of one un-specific apartment --> mApartment = new Apartment();
+
+        //FB related code here
         mCallbackManager = CallbackManager.Factory.create();
 
 //originally was getContext() but that didn't work here. getActivity returns the activity associated with a fragment and the Activity is a context since Activity extends Context
         //remember, Activity is a context since Activity extends Context
         FacebookSdk.sdkInitialize(getActivity() );
 
+        //The CallbackManager manages the callbacks into the FacebookSdk
         mCallbackManager = CallbackManager.Factory.create();
-        //AccessTokenTracker is meant to track if your app has a new acess token for that user
-        //seems like we can and probably should move all of this to the fragment's onCreate method tho?
+
+//AccessTokenTracker is meant to track if your app has a new acesss token for that user
+//Your app can only have one person at a time logged in and LoginManager sets the current AccessToken
+// and Profile for that person
         mAccessTokenTracker = new AccessTokenTracker() {
             @Override
             protected void onCurrentAccessTokenChanged(AccessToken oldAccessToken, AccessToken currentAccessToken) {
-            }
+                //trying to account for edge case where log-in status changes while they're still on the apartment page
+                //edge solved when you log-in but still lets you log-out then schedule a viewing if you don't leave the page
+                if (isLoggedIn() == true) {
+                    mScheduleButton.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            Intent intent = ScheduleViewingActivity.newIntent(getActivity(), mApartment.getId());
+                            startActivity(intent);
+                                    }
+                                });
+                }
+                else {
+                    mScheduleButton.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            Toast.makeText(getActivity(), "We need you to log-in before you can schedule a viewing", Toast.LENGTH_LONG).show();
+                                    }
+                                });
+                }
+
+            } // end of onCurrentAccessTokenChanged method
 
         };
         //ProfileTracker track's if user's changed their profile picture etc
         mProfileTracker = new ProfileTracker() {
             @Override
             protected void onCurrentProfileChanged(Profile oldProfile, Profile currentProfile) {
+
 
             }
         };
@@ -89,6 +116,14 @@ public class ApartmentFragment extends Fragment {
 
     }
 
+
+    //to check if the user is logged-in
+    //Your app can only have one person at a time logged in and LoginManager sets the currentAccessToken
+    // and Profile for that person. So despite what the documentation would lead you to believe access tokens are for users
+    public boolean isLoggedIn() {
+        mAccessToken = AccessToken.getCurrentAccessToken(); //this is the FB method for seeing if someone is logged-in
+        return mAccessToken != null;
+            }
 
 
 //to explicitly inflate the fragment's view. basically just calling LayoutInflater.inflate(....) and passing in the layout resource ID
@@ -109,16 +144,30 @@ public class ApartmentFragment extends Fragment {
         mScheduleButton = (Button) v.findViewById(R.id.schedule_button);
 
         //pulling up our scheduleview page upon a click of the schedule button
+        //if statement added to check if a user is logged in
         //reminder getActivity is a method defined in the Android Activity class (same with onCreate etc etc)
         //here we're starting an activity from a fragment using an explicit intent and then calling Fragment.startActivity(intent)
         //specifically we're calling the right apartment to show by calling the newIntent method we defined in ScheduleViewingActivity and getting Id from our Apartment model layer as well
-        mScheduleButton.setOnClickListener(new View.OnClickListener() {
-             @Override
+
+
+        if (isLoggedIn() == true) {
+            mScheduleButton.setOnClickListener(new View.OnClickListener() {
+                @Override
                 public void onClick(View v) {
-                 Intent intent = ScheduleViewingActivity.newIntent(getActivity(), mApartment.getId());
-                 startActivity(intent);
-                    }
-        });
+                    Intent intent = ScheduleViewingActivity.newIntent(getActivity(), mApartment.getId());
+                    startActivity(intent);
+                }
+            });
+                }
+        else {
+            mScheduleButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Toast.makeText(getActivity(), "We need you to log-in before you can schedule a viewing", Toast.LENGTH_LONG).show();
+                        }
+            });
+        }
+
 
         //FB log-in button
         mFbLoginButton = (LoginButton) v.findViewById(R.id.login_button);
