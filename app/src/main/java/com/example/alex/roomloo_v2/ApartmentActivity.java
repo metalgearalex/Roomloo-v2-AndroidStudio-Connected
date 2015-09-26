@@ -2,9 +2,15 @@
 
 package com.example.alex.roomloo_v2;
 
+import android.app.Dialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GooglePlayServicesUtil;
 
 import java.util.UUID;
 
@@ -21,7 +27,7 @@ public class ApartmentActivity extends SingleFragmentActivity {
 //Also believe the key definition here doesn't actually matter it's just that an activity can start from different places
 // so you generally use your package name to prevent name collisions with extras in other apps
    private static final String EXTRA_APARTMENT_ID ="com.example.alex.roomloo_v2.Apartment.Apartment_mId"; //if something wrong it's because this isn't the right mapping. see pg 195. also pg 199 they changed it to private
-
+   private static final int REQUEST_ERROR = 0; //for Google Maps error check
 
     public static Intent newIntent(Context packageContext, UUID apartmentId) { //Reminder: Context argument specifies which application package the activity class can be found in
         Intent intent = new Intent(packageContext, ApartmentActivity.class);
@@ -35,15 +41,40 @@ public class ApartmentActivity extends SingleFragmentActivity {
 // but to call the exact Apartment the user clicked on we're calling ApartmentFragment.newInstance(UUID) (i.e. the newInstance method defined in ApartmentFragment
 // the UUID we pass in is the one we retrieve from its extra
 // getSerializableExtra returns the value from putExtra in our newIntent method above (so apartmentId)
-
+//Also creating a FragmentManager so we can setup a Google MapFragment (used in ApartmentFragment)
+    public static FragmentManager fragmentManager;
     @Override
     protected Fragment createFragment() {
         UUID apartmentId = (UUID) getIntent().getSerializableExtra(EXTRA_APARTMENT_ID);
+
+// initialising the object of the FragmentManager
+        fragmentManager = getSupportFragmentManager();
+
         return ApartmentFragment.newInstance(apartmentId);
-
-
             }
 
 
+
+//verifying that Google Play Services is available and
+// an up-to-date version of the Play Store is there so we can use the Google Maps API
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        int errorCode = GooglePlayServicesUtil.isGooglePlayServicesAvailable(this);
+
+        if(errorCode != ConnectionResult.SUCCESS) {
+            Dialog errorDialog = GooglePlayServicesUtil
+                    .getErrorDialog(errorCode, this, REQUEST_ERROR,
+                            new DialogInterface.OnCancelListener() {
+                                    @Override
+                                        public void onCancel(DialogInterface dialog) {
+                                        //Leave if services are unavailable.
+                                        finish();
+                                                }
+                            });
+            errorDialog.show();
+        } //end of if statement
+    } //end of onResume
 
 }

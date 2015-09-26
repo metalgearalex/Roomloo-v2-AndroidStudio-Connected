@@ -24,6 +24,8 @@ import com.facebook.Profile;
 import com.facebook.ProfileTracker;
 import com.facebook.login.LoginResult;
 import com.facebook.login.widget.LoginButton;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.SupportMapFragment;
 
 import java.util.UUID;
 
@@ -36,6 +38,7 @@ public class ApartmentFragment extends Fragment {
     private static final String ARG_APARTMENT_ID = "apartment_id";
     private ImageView mApartmentImageView;
     private TextView mApartmentTextView;
+
     private LoginButton mFbLoginButton;
     private CallbackManager mCallbackManager;
     private AccessTokenTracker mAccessTokenTracker;
@@ -43,7 +46,8 @@ public class ApartmentFragment extends Fragment {
     private Button mScheduleButton;
     private AccessToken mAccessToken;
 
-
+    private static GoogleMap mMap;
+    private static Double latitude, longitude;
 
     //to retrieve an extra (i.e. which apartment is this that we're showing?)
     //basically stashing the data(apartment's id) in its arguments bundle
@@ -55,7 +59,7 @@ public class ApartmentFragment extends Fragment {
         ApartmentFragment fragment = new ApartmentFragment();
         fragment.setArguments(args);
         return fragment;
-            }
+    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -63,9 +67,8 @@ public class ApartmentFragment extends Fragment {
         UUID apartmentId = (UUID) getArguments().getSerializable(ARG_APARTMENT_ID);
         mApartment = ApartmentInventory.get(getActivity() ).getApartment(apartmentId);//former code that worked to pull up the view of one un-specific apartment --> mApartment = new Apartment();
 
-        //FB related code here
-        mCallbackManager = CallbackManager.Factory.create();
 
+        //FB related code here
 //originally was getContext() but that didn't work here. getActivity returns the activity associated with a fragment and the Activity is a context since Activity extends Context
         //remember, Activity is a context since Activity extends Context
         FacebookSdk.sdkInitialize(getActivity() );
@@ -79,25 +82,7 @@ public class ApartmentFragment extends Fragment {
         mAccessTokenTracker = new AccessTokenTracker() {
             @Override
             protected void onCurrentAccessTokenChanged(AccessToken oldAccessToken, AccessToken currentAccessToken) {
-                //trying to account for edge case where log-in status changes while they're still on the apartment page
-                //edge solved when you log-in but still lets you log-out then schedule a viewing if you don't leave the page
-                if (isLoggedIn() == true) {
-                    mScheduleButton.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            Intent intent = ScheduleViewingActivity.newIntent(getActivity(), mApartment.getId());
-                            startActivity(intent);
-                                    }
-                                });
-                }
-                else {
-                    mScheduleButton.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            Toast.makeText(getActivity(), "We need you to log-in before you can schedule a viewing", Toast.LENGTH_LONG).show();
-                                    }
-                                });
-                }
+                updateToken(AccessToken.getCurrentAccessToken() ); //doesn't seem to matter if you just pass in currentAccesstToken
 
             } // end of onCurrentAccessTokenChanged method
 
@@ -123,16 +108,52 @@ public class ApartmentFragment extends Fragment {
     public boolean isLoggedIn() {
         mAccessToken = AccessToken.getCurrentAccessToken(); //this is the FB method for seeing if someone is logged-in
         return mAccessToken != null;
-            }
+    }
+
+    //method for if you're logged in, let the schedule button work, if not don't
+    private void updateToken (AccessToken currentAccessToken) {
+        //trying to account for edge case where log-in status changes while they're still on the apartment page
+        //edge solved when you log-in but still lets you log-out then schedule a viewing if you don't leave the page
+
+        if (isLoggedIn() ) {
+            mScheduleButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent intent = ScheduleViewingActivity.newIntent(getActivity(), mApartment.getId());
+                    startActivity(intent);
+                }
+            });
+        }
+        else {
+            mScheduleButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Toast.makeText(getActivity(), "We need you to log-in before you can schedule a viewing", Toast.LENGTH_LONG).show();
+                }
+            });
+        }
+    }
 
 
-//to explicitly inflate the fragment's view. basically just calling LayoutInflater.inflate(....) and passing in the layout resource ID
+    //to explicitly inflate the fragment's view. basically just calling LayoutInflater.inflate(....) and passing in the layout resource ID
 //second parameter is your view's parent, usually needed to configure widgets properly
 //third parameter tells the layout inflater whether to add the inflated view to the view's parent.
 //We're passing in false because we're adding the view in the activity's code for more flexibility
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.apartment_details_page, container, false);
+
+        //Google Maps Code
+        if (container == null) {
+            return null;
+                }
+        // Passing harcoded values for latitude & longitude. Please change as per your need. This is just used to drop a Marker on the Map
+        latitude = 40.733534;
+        longitude = 73.986486;
+
+        setUpMapIfNeeded(); // For setting up the MapFragment
+        //end of Google Maps Code in onCreateView at least
+
         mApartmentTextView = (TextView) v.findViewById(R.id.details_page_apartment_text);
         mApartmentTextView.setText(mApartment.getApartmentText()); //yes this works and is necessary to show the apartment text on the specific-apartment-view's page. Oddly enough, sometimes Android gets a nullpointerexception with this line, if you get it just temporarily comment out this line so you  can see what the real error is
 
@@ -148,25 +169,8 @@ public class ApartmentFragment extends Fragment {
         //reminder getActivity is a method defined in the Android Activity class (same with onCreate etc etc)
         //here we're starting an activity from a fragment using an explicit intent and then calling Fragment.startActivity(intent)
         //specifically we're calling the right apartment to show by calling the newIntent method we defined in ScheduleViewingActivity and getting Id from our Apartment model layer as well
+        updateToken(AccessToken.getCurrentAccessToken() );
 
-
-        if (isLoggedIn() == true) {
-            mScheduleButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    Intent intent = ScheduleViewingActivity.newIntent(getActivity(), mApartment.getId());
-                    startActivity(intent);
-                }
-            });
-                }
-        else {
-            mScheduleButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    Toast.makeText(getActivity(), "We need you to log-in before you can schedule a viewing", Toast.LENGTH_LONG).show();
-                        }
-            });
-        }
 
 
         //FB log-in button
@@ -192,20 +196,43 @@ public class ApartmentFragment extends Fragment {
                 AccessToken accessToken = loginResult.getAccessToken(); //getAccessToken is an instance method that returns the new access Token
                 Profile profile = Profile.getCurrentProfile(); //see the Profile documentation
 
-                    }//end of onSuccess method
+            }//end of onSuccess method
 
             @Override
             public void onCancel() {
-                Toast.makeText(getActivity(),"Please log-in so you can schedule a viewing or shoot us an email",Toast.LENGTH_SHORT).show();
-                    }
+                Toast.makeText(getActivity(), "Please log-in so you can schedule a viewing or shoot us an email",Toast.LENGTH_SHORT).show();
+            }
 
             @Override
             public void onError(FacebookException exception) {
                 Toast.makeText(getActivity(),"Sorry, something seems to have gone wrong with your log-in attempt", Toast.LENGTH_SHORT).show();
-                    }
+            }
         });//end of register callback method
 
         return v;
+    }
+
+    /***** Sets up the map if it is possible to do so *****/
+    public static void setUpMapIfNeeded() {
+        // Do a null check to confirm that we have not already instantiated the map.
+        if (mMap == null) {
+            // Try to obtain the map from the SupportMapFragment.
+            mMap = ((SupportMapFragment) ApartmentActivity.fragmentManager //need to house the supportmapfragment somewhere first
+                    .findFragmentById(R.id.location_map)).getMap();
+        }
+    }
+
+    /**** The mapfragment's id must be removed from the FragmentManager
+     **** or else if the same it is passed on the next time then
+     **** app will crash ****/
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        if (mMap != null) {
+            ApartmentActivity.fragmentManager.beginTransaction()
+                    .remove(ApartmentActivity.fragmentManager.findFragmentById(R.id.location_map)).commit();
+            mMap = null;
+                }
     }
 
     @Override
@@ -213,14 +240,14 @@ public class ApartmentFragment extends Fragment {
         super.onStop();
         mAccessTokenTracker.stopTracking();
         mProfileTracker.stopTracking();
-            }
+    }
 
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         mCallbackManager.onActivityResult(requestCode, resultCode, data);
-            }
+    }
 
 
 }
@@ -261,3 +288,4 @@ public class ApartmentFragment extends Fragment {
 //Bitmap mOriginalImage; //to try and compress the photo?
 //Bitmap mCompressedImage; //to try and compress the photo?
 //ByteArrayOutputStream mOutputStream; //to try and compress the photo?
+
