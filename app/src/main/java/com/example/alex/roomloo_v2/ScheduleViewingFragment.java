@@ -10,6 +10,11 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.Toast;
+
+import com.facebook.AccessToken;
+import com.facebook.CallbackManager;
+import com.facebook.FacebookSdk;
 
 import java.util.Date;
 import java.util.UUID;
@@ -26,7 +31,8 @@ public class ScheduleViewingFragment extends Fragment {
     private static final String DIALOG_TIME = "DialogTime"; //for TimePicker
     private static final int REQUEST_DATE = 53;
     private final int REQUEST_TIME=179;
-
+    private CallbackManager mCallbackManager_Schedule;
+    private AccessToken mAccessToken_Schedule;
 
     //actually attaching arguments bundle to a fragment
     //here we're stashing the crime ID someplace and that someplace is in its bundle
@@ -48,7 +54,19 @@ public class ScheduleViewingFragment extends Fragment {
         //to enable passing data to your Dialog Fragments - see pg 199
         UUID apartmentId = (UUID) getArguments().getSerializable(ARG_APARTMENT_ID_SCHEDULER);
         mApartment = ApartmentInventory.get(getActivity() ).getApartment(apartmentId);
-            }
+
+
+        //FB related code here
+        mCallbackManager_Schedule = CallbackManager.Factory.create();
+
+//originally was getContext() but that didn't work here. getActivity returns the activity associated with a fragment and the Activity is a context since Activity extends Context
+        //remember, Activity is a context since Activity extends Context
+        FacebookSdk.sdkInitialize(getActivity());
+
+        //The CallbackManager manages the callbacks into the FacebookSdk
+        mCallbackManager_Schedule = CallbackManager.Factory.create();
+
+            } //end of onCreate
 
     @Override
     public View onCreateView (LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -58,36 +76,72 @@ public class ScheduleViewingFragment extends Fragment {
         //setTargetFragment(Fragment fragment, int requestCode) opens up a connection between the fragments so that you can return data back from your dialogFragments
         // to this Fragment by setting this fragment as its Target
         mDateButton = (Button) v.findViewById(R.id.date_button);
-        //commenting out causes error and we already have text for it's onCreate (in the XML), i.e. What Day? and set Text as chosen by user in onActivityResult >> mDateButton.setText(mApartment.getDate().toString() ); //to display the date chosen
-        mDateButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                FragmentManager manager = getFragmentManager();
-                DatePickerFragment dialog = DatePickerFragment.newInstance(mApartment.getDate()); //former code DatePickerFragment dialog = new DatePickerFragment(); however new code allows us to pass date to DatePickerFragment
-                dialog.setTargetFragment(ScheduleViewingFragment.this, REQUEST_DATE);
-                dialog.show(manager, DIALOG_DATE); //displays the Dialog, /parameters = FragmentManager, String TAG
-            }
-        });
-
         mTimeButton = (Button) v.findViewById(R.id.time_button);
-        //commenting out causes error and we already have text for it's onCreate (in the XML), i.e. What Day? and set Text as chosen by user in onActivityResult>>  mTimeButton.setText(mApartment.getDate().toString() ); //to display the time chosen
-        mTimeButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                FragmentManager manager = getFragmentManager();
-                TimePickerFragment dialog = TimePickerFragment.newInstance(mApartment.getDate() ); //former code DatePickerFragment dialog = new DatePickerFragment(); however new code allows us to pass date to DatePickerFragment
-                dialog.setTargetFragment(ScheduleViewingFragment.this, REQUEST_TIME);
-                dialog.show(manager, DIALOG_TIME); //displays the Dialog, /parameters = FragmentManager, String TAG
-            }
-        });
+        //commenting out causes error and we already have text for it's onCreate (in the XML), i.e. What Day? and set Text as chosen by user in onActivityResult >> mDateButton.setText(mApartment.getDate().toString() ); //to display the date chosen
+
+
+//the isLoggedIn method is repeated here because I encountered an edge case where if you logged out on the Apartment-Details
+//Page you could still click through to schedule a viewing. So basically here we're just repeating the check to make sure
+//they really are logged in
+                if (isLoggedIn() ) {
+
+                    mDateButton.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            FragmentManager manager = getFragmentManager();
+                            DatePickerFragment dialog = DatePickerFragment.newInstance(mApartment.getDate()); //former code DatePickerFragment dialog = new DatePickerFragment(); however new code allows us to pass date to DatePickerFragment
+                            dialog.setTargetFragment(ScheduleViewingFragment.this, REQUEST_DATE);
+                            dialog.show(manager, DIALOG_DATE); //displays the Dialog, /parameters = FragmentManager, String TAG
+                        }
+                    });
+
+
+                    //commenting out causes error and we already have text for it's onCreate (in the XML), i.e. What Day? and set Text as chosen by user in onActivityResult>>  mTimeButton.setText(mApartment.getDate().toString() ); //to display the time chosen
+                    mTimeButton.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            FragmentManager manager = getFragmentManager();
+                            TimePickerFragment dialog = TimePickerFragment.newInstance(mApartment.getDate()); //former code DatePickerFragment dialog = new DatePickerFragment(); however new code allows us to pass date to DatePickerFragment
+                            dialog.setTargetFragment(ScheduleViewingFragment.this, REQUEST_TIME);
+                            dialog.show(manager, DIALOG_TIME); //displays the Dialog, /parameters = FragmentManager, String TAG
+                        }
+                    });
+                } else {
+                    mDateButton.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            Toast.makeText(getActivity(), "Please go back and Log-In First", Toast.LENGTH_LONG).show();
+                        }
+                    });
+
+                    mTimeButton.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            Toast.makeText(getActivity(), "Please go back and Log-In First", Toast.LENGTH_LONG).show();
+                        }
+                    });
+
+                }
+
 
         return v;
             } //end of onCreateView
+
+    //to check if the user is logged-in
+    //Your app can only have one person at a time logged in and LoginManager sets the currentAccessToken
+    // and Profile for that person. So despite what the documentation would lead you to believe access tokens are for users
+    public boolean isLoggedIn() {
+        mAccessToken_Schedule = AccessToken.getCurrentAccessToken(); //this is the FB method for seeing if someone is logged-in
+        return mAccessToken_Schedule != null;
+            }
+
 
     //to retrieve the Date the user input in your DatePicker dialog
     //reminder requestCode is used to identify which fragment is reporting back
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        mCallbackManager_Schedule.onActivityResult(requestCode, resultCode, data); //no idea if this is still necessary, but prob
+
         if (resultCode != Activity.RESULT_OK) {
             return;
                 }

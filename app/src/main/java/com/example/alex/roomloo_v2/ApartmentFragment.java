@@ -36,6 +36,7 @@ public class ApartmentFragment extends Fragment {
     private static final String ARG_APARTMENT_ID = "apartment_id";
     private ImageView mApartmentImageView;
     private TextView mApartmentTextView;
+
     private LoginButton mFbLoginButton;
     private CallbackManager mCallbackManager;
     private AccessTokenTracker mAccessTokenTracker;
