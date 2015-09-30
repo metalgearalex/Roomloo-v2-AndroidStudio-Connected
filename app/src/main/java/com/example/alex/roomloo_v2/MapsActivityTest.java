@@ -14,7 +14,7 @@ public class MapsActivityTest extends FragmentActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.apartment_details_page);
+        setContentView(R.layout.apartment_details_page); //the layout specified here doesn't matter
 
         // initialising the object of the FragmentManager. Here I'm passing getSupportFragmentManager(). You can pass getFragmentManager() if you are coding for Android 3.0 or above.
         fragmentManager = getSupportFragmentManager();

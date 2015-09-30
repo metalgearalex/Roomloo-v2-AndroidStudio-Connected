@@ -46,10 +46,6 @@ public class ApartmentActivity extends SingleFragmentActivity {
     @Override
     protected Fragment createFragment() {
         UUID apartmentId = (UUID) getIntent().getSerializableExtra(EXTRA_APARTMENT_ID);
-
-// initialising the object of the FragmentManager
-        fragmentManager = getSupportFragmentManager();
-
         return ApartmentFragment.newInstance(apartmentId);
             }
 

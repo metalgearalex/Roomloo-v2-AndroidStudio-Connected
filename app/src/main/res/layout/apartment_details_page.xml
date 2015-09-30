@@ -40,7 +40,8 @@
     <fragment
         android:id="@+id/location_map"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="250dp"
+        android:layout_below="@id/details_page_apartment_text"
         class="com.google.android.gms.maps.SupportMapFragment" />
 
 </RelativeLayout>

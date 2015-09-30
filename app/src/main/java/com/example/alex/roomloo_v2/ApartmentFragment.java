@@ -24,8 +24,13 @@ import com.facebook.Profile;
 import com.facebook.ProfileTracker;
 import com.facebook.login.LoginResult;
 import com.facebook.login.widget.LoginButton;
+import com.google.android.gms.maps.CameraUpdate;
+import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.util.UUID;
 
@@ -46,8 +51,11 @@ public class ApartmentFragment extends Fragment {
     private Button mScheduleButton;
     private AccessToken mAccessToken;
 
+    private static View view;
     private static GoogleMap mMap;
-    private static Double latitude, longitude;
+    private static Double latitude;
+    private static Double longitude;
+    private SupportMapFragment mSupportMapFragment;
 
     //to retrieve an extra (i.e. which apartment is this that we're showing?)
     //basically stashing the data(apartment's id) in its arguments bundle
@@ -141,17 +149,60 @@ public class ApartmentFragment extends Fragment {
 //We're passing in false because we're adding the view in the activity's code for more flexibility
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+
         View v = inflater.inflate(R.layout.apartment_details_page, container, false);
 
-        //Google Maps Code
-        if (container == null) {
-            return null;
-                }
-        // Passing harcoded values for latitude & longitude. Please change as per your need. This is just used to drop a Marker on the Map
-        latitude = 40.733534;
-        longitude = 73.986486;
+        //This fragment is the simplest way to place a map in an application.
+        // It's a wrapper around a view of a map to automatically handle the necessary life cycle needs
+        mSupportMapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.location_map);
 
-        setUpMapIfNeeded(); // For setting up the MapFragment
+        if (mSupportMapFragment != null) {
+//A GoogleMap must be acquired using getMapAsync(OnMapReadyCallback). This class automatically initializes the maps system and the view
+// The callback method provides you with a GoogleMap instance guaranteed to be non-null and ready to be used.
+            mSupportMapFragment.getMapAsync(new OnMapReadyCallback() {
+
+                //override onMapReady is auto-filled for you by Android Studio
+                @Override
+                public void onMapReady(GoogleMap googleMap) {
+                    if (googleMap != null) {
+
+                        googleMap.getUiSettings().setAllGesturesEnabled(true); //not necessary allows all gestures (moving the camera, rotating, etc)
+
+                        // Passing harcoded values for latitude & longitude. Need to make dynamic post integration with database
+                        latitude = 40.733460;
+                        longitude = -73.986400;
+                        LatLng marker_latlng = new LatLng(latitude, longitude);
+
+                        //target = the location the camera is pointing at
+                        //trying to replace with just position >> CameraPosition cameraPosition = new CameraPosition.Builder().target(marker_latlng).zoom(15.0f).build();
+
+                        // For dropping a marker and positioning the camera (i.e. map) at a point on the Map
+                        //title is what shows up when you click on the marker
+                        googleMap.addMarker(new MarkerOptions().position(marker_latlng).title("Apartment").snippet("Address"));
+                        //to actually auto-zoom-in on that marker
+                        CameraUpdate yourLocation = CameraUpdateFactory.newLatLngZoom(marker_latlng, 17); //5 is the zoom level
+                        googleMap.animateCamera(yourLocation);
+//commenting out some stackoverflow code because don't think we need it and seems to be messing things up
+                        //
+                        //googleMap.moveCamera(cameraUpdate);
+
+
+                        //mMap.setMyLocationEnabled(true);
+                        // For dropping a marker at a point on the Map
+                        //mMap.addMarker(new MarkerOptions().position(new LatLng(latitude, longitude)).title("My Home").snippet("Home Address"));
+                        // For zooming automatically to the Dropped PIN Location
+                        //mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(latitude,longitude), 12.0f));
+
+                    }
+
+                }
+            });
+        }
+
+
+
+
+        //setUpMapIfNeeded(); // For setting up the MapFragment
         //end of Google Maps Code in onCreateView at least
 
         mApartmentTextView = (TextView) v.findViewById(R.id.details_page_apartment_text);
@@ -210,30 +261,79 @@ public class ApartmentFragment extends Fragment {
         });//end of register callback method
 
         return v;
-    }
+    } //end of onCreateView
+
 
     /***** Sets up the map if it is possible to do so *****/
-    public static void setUpMapIfNeeded() {
+    //public static void setUpMapIfNeeded() {
         // Do a null check to confirm that we have not already instantiated the map.
-        if (mMap == null) {
+        //if (mSupportMapFragment == null) {
             // Try to obtain the map from the SupportMapFragment.
-            mMap = ((SupportMapFragment) ApartmentActivity.fragmentManager //need to house the supportmapfragment somewhere first
-                    .findFragmentById(R.id.location_map)).getMap();
-        }
-    }
+           // mSupportMapFragment = ((SupportMapFragment) ApartmentActivity.fragmentManager
+             //       .findFragmentById(R.id.location_map)).getMapAsync(new OnMapReadyCallback() { //callback for Google maps
+      //          @Override
+        //        public void onMapReady(mMap) { //once set onMapReady(GoogleMap) method is triggered when the map is ready to be used and provides a non-null instance of GoogleMap
+          //          setUpMap();
+           //     }
+      //      });
 
+        //    if (mMap != null)
+
+//        }
+  //  }
+
+
+    /**
+     * This is where we can add markers or lines, add listeners or move the
+     * camera.
+     * <p>
+     * This should only be called once and when we are sure that {@link #mMap}
+     * is not null.
+     */
+//    private static void setUpMap() {
+//        // For showing a move to my loction button
+//        mMap.setMyLocationEnabled(true);
+//        // For dropping a marker at a point on the Map
+//        mMap.addMarker(new MarkerOptions().position(new LatLng(latitude, longitude)).title("My Home").snippet("Home Address"));
+////        // For zooming automatically to the Dropped PIN Location
+//        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(latitude,
+//                longitude), 12.0f));
+//    }
+
+
+//    @Override
+//    public void onViewCreated(View view, Bundle savedInstanceState) {
+//        // TODO Auto-generated method stub
+//        if (mMap != null)
+//            setUpMap();
+
+
+//        if (mMap == null) {
+//            // Try to obtain the map from the SupportMapFragment.
+//            mMap = ((SupportMapFragment) MapsActivityTest.fragmentManager
+//                    .findFragmentById(R.id.location_map)).getMap(); // getMap is deprecated
+//            // Check if we were successful in obtaining the map.
+//            if (mMap != null)
+//                setUpMap();
+//        }
+//    }
+
+
+
+
+//put this back in
     /**** The mapfragment's id must be removed from the FragmentManager
      **** or else if the same it is passed on the next time then
      **** app will crash ****/
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-        if (mMap != null) {
-            ApartmentActivity.fragmentManager.beginTransaction()
-                    .remove(ApartmentActivity.fragmentManager.findFragmentById(R.id.location_map)).commit();
-            mMap = null;
-                }
-    }
+//    @Override
+//    public void onDestroyView() {
+//        super.onDestroyView();
+//        if (mMap != null) {
+//            ApartmentActivity.fragmentManager.beginTransaction()
+//                    .remove(ApartmentActivity.fragmentManager.findFragmentById(R.id.location_map)).commit();
+//            mMap = null;
+//                }
+//    }
 
     @Override
     public void onStop() {
