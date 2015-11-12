@@ -14,7 +14,12 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.util.List;
 
 /**
@@ -52,16 +57,26 @@ public class ListingsFragment extends Fragment {
         mListingsRecyclerView = (RecyclerView) view.findViewById(R.id.listings_recycler_view);
         mListingsRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity())); //there are other types of LayoutManagers available too like a GridLayoutManager
 
-        updateUI();
-
-        return view;
+        //had to add try / finally because updateUI can now throw IOExceptions / JSONExceptions
+        try {
+            updateUI();
+        }
+        finally {
+            return view;
+        }
             }
 
 
 
-    private void updateUI() {
-        ApartmentInventory apartmentInventory = ApartmentInventory.get(getActivity() );
-        List <Apartment> apartments = apartmentInventory.getApartmentList();
+    private void updateUI() throws IOException, JSONException { //added the throws part
+        ApartmentInventory apartmentInventory = ApartmentInventory.get(getActivity());
+
+        //the JSONObject / JSONArray lines are really there to prevent a non-static method from a static context error in getApartmentList()
+        JSONObject jsonBody = new JSONObject();
+        JSONObject idJsonObject = jsonBody.getJSONObject("id");
+        JSONArray idJsonArray = idJsonObject.getJSONArray("id");
+
+        List <Apartment> apartments = apartmentInventory.getApartmentList(idJsonArray);//seems like this is where we truly define the JSONArray parameter
 
         mListingsAdapter = new ListingsAdapter(apartments);
         mListingsRecyclerView.setAdapter(mListingsAdapter);

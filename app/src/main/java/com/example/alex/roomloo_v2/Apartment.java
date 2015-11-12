@@ -12,6 +12,8 @@ public class Apartment {
     private UUID mId;
     private String mApartmentText;
     private Date mDate;
+    private double mlatitude; //added for database -> Google Map
+    private double mlongitude; //added for database -> Google Map
     //perhaps we need a photoTitle to get the right picture?
     // in CriminalIntent we did:
         // public String getPhotoFilename() {
@@ -47,6 +49,16 @@ public class Apartment {
     public void setDate(Date date) {
         mDate = date;
     }
+
+    //added to store location of apartment from Database for Google maps
+    public void setApartmentLatitude (Double latitude) {
+        mlatitude = latitude;
+            }
+
+    public void setApartmentLongitude (Double longitude) {
+        mlongitude = longitude;
+            }
+
 
 }
 

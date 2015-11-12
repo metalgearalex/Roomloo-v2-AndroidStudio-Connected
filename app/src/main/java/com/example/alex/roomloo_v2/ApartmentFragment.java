@@ -171,7 +171,10 @@ public class ApartmentFragment extends Fragment {
                         // Passing harcoded values for latitude & longitude. Need to make dynamic post integration with database
                         latitude = 40.733460;
                         longitude = -73.986400;
-                        LatLng marker_latlng = new LatLng(latitude, longitude);
+
+
+                        UUID apartmentId = (UUID) getArguments().getSerializable(ARG_APARTMENT_ID);
+                        LatLng marker_latlng = new LatLng(ApartmentInventory.getApartmentLatitude(apartmentId), ApartmentInventory.getApartmentLongitude(apartmentId) );
 
                         //target = the location the camera is pointing at
                         //trying to replace with just position >> CameraPosition cameraPosition = new CameraPosition.Builder().target(marker_latlng).zoom(15.0f).build();
