@@ -20,8 +20,7 @@ import java.io.IOException;
  */
 public class ApiConnector {
 
-    public JSONArray GetAllCustomers()
-    {
+    public JSONArray GetAllCustomers() {
         // URL where your API is located
         String url = "http://192.168.0.7/~tahseen0amin/Tutorial/getAllCustomers.php"; //change this to Ruby API location
 
@@ -74,4 +73,4 @@ public class ApiConnector {
 
     } //end of public JSONArray GetAllCustomers() method
 
-}//end of apiconenctor class
+}//end of apiconnector class

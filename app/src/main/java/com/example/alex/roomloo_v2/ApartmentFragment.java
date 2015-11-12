@@ -172,10 +172,9 @@ public class ApartmentFragment extends Fragment {
                         latitude = 40.733460;
                         longitude = -73.986400;
 
-
                         UUID apartmentId = (UUID) getArguments().getSerializable(ARG_APARTMENT_ID);
-                        LatLng marker_latlng = new LatLng(ApartmentInventory.getApartmentLatitude(apartmentId), ApartmentInventory.getApartmentLongitude(apartmentId) );
-
+                        ApartmentInventory apartmentInventory = new ApartmentInventory(getActivity() );//this line attempts to get rid of the non-static method / static context error. getActivity() returns the activity associated with a fragment. Activity is a context (since Activity extends Context)
+                        LatLng marker_latlng = new LatLng(apartmentInventory.getApartmentLatitude(apartmentId), apartmentInventory.getApartmentLongitude(apartmentId) );
 
                         //target = the location the camera is pointing at
                         //trying to replace with just position >> CameraPosition cameraPosition = new CameraPosition.Builder().target(marker_latlng).zoom(15.0f).build();

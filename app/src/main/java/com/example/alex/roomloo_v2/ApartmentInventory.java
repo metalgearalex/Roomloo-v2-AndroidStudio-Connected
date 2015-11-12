@@ -43,7 +43,7 @@ public class ApartmentInventory {
             }
 
 //getting our apartment inventory
-    private ApartmentInventory (Context context) {
+    public ApartmentInventory (Context context) { //changed to public to try to fix non-static method / static context in ApartmentFragment class within onCreateView method / GoogleMaps code
 
         new GetAllCustomerTask().execute(new ApiConnector()); //maybe move this to one of your oncreate methods in your mainactivity?
 
@@ -167,17 +167,17 @@ public class ApartmentInventory {
             return null;
         }
         else {
-            Apartment apartment = new Apartment();
-        apartment.setApartmentText(jsonString);
-        return apartment;
-            }
+            Apartment apartment = new Apartment(id);//id here is a placeholder and gets a real value in ApartmentFragment
+            apartment.setApartmentText(jsonString);
+            return apartment;
+                }
 
     }//end of getApartment method
 
 
     //added this method to get location from database for Google Maps
     //passing in the id so that the location it brings me is for one specific apartment
-    public Apartment getApartmentLatitude (UUID id) {
+    public double getApartmentLatitude (UUID id) {//id here is a placeholder and gets a real value in ApartmentFragment
 
         Double jsonString  = null;
 
@@ -190,21 +190,17 @@ public class ApartmentInventory {
             e.printStackTrace();
         }
 
-        if (jsonString ==null) {
-            return null;
-        }
-        else {
-            Apartment apartment = new Apartment();
+            Apartment apartment= new Apartment(id);
             apartment.setApartmentLatitude(jsonString);
-            return apartment;
-        }
+            return jsonString;
 
-    }//end of getApartment method
+
+    }//end of getApartmentLatitude method
 
 
     //added this method to get location from database for Google Maps
     //passing in the id so that the location it brings me is for one specific apartment
-    public Apartment getApartmentLongitude (UUID id) {
+    public double getApartmentLongitude (UUID id) { //id here is a placeholder and gets a real value in ApartmentFragment
 
         Double jsonString  = null;
 
@@ -212,21 +208,17 @@ public class ApartmentInventory {
 
         JSONObject json = null;
         try {
-            jsonString = json.getDouble(jsonString + "longitude: ");
+            jsonString = json.getDouble(jsonString + "latitude: ");
         } catch (JSONException e) {
             e.printStackTrace();
         }
 
-        if (jsonString ==null) {
-            return null;
-        }
-        else {
-            Apartment apartment = new Apartment();
-            apartment.setApartmentLongitude(jsonString);
-            return apartment;
-        }
+        Apartment apartment= new Apartment(id);
+        apartment.setApartmentLatitude(jsonString);
+        return jsonString;
 
-    }//end of getApartment method
+
+    }//end of getApartmentLongitude method
 
 
 }
