@@ -176,6 +176,7 @@ public class ApartmentFragment extends Fragment {
                         UUID apartmentId = (UUID) getArguments().getSerializable(ARG_APARTMENT_ID);
                         LatLng marker_latlng = new LatLng(ApartmentInventory.getApartmentLatitude(apartmentId), ApartmentInventory.getApartmentLongitude(apartmentId) );
 
+
                         //target = the location the camera is pointing at
                         //trying to replace with just position >> CameraPosition cameraPosition = new CameraPosition.Builder().target(marker_latlng).zoom(15.0f).build();
 
