@@ -16,7 +16,6 @@ import android.widget.TextView;
 
 import org.json.JSONArray;
 import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -72,11 +71,15 @@ public class ListingsFragment extends Fragment {
         ApartmentInventory apartmentInventory = ApartmentInventory.get(getActivity());
 
         //the JSONObject / JSONArray lines are really there to prevent a non-static method from a static context error in getApartmentList()
-        JSONObject jsonBody = new JSONObject();
-        JSONObject idJsonObject = jsonBody.getJSONObject("id");
-        JSONArray idJsonArray = idJsonObject.getJSONArray("id");
+        JSONArray placeholderJsonAray = new JSONArray(); //does this make sense? creating a placeholderJsonArray to then call getJSONArray on and get the Array at position 0 , i.e. the first one
+        JSONArray realJsonArrayValue = placeholderJsonAray.getJSONArray(0);
 
-        List <Apartment> apartments = apartmentInventory.getApartmentList(idJsonArray);//seems like this is where we truly define the JSONArray parameter
+        //something along these lines may be an alternative for the above
+        //we'd be constructing a JSONObject first because .getJSONArray requires an index instead of a string when you do JSONObject.getJSONArray
+             // JSONObject placeholderJsonObject = new JSONObject();
+            //JSONArray realJsonArrayValue = placeholderJsonObject.getJSONArray("apartments"); //this area is where we define JSONArray i.e. point to "apartments" in the API
+
+        List <Apartment> apartments = apartmentInventory.getApartmentList(realJsonArrayValue);//seems like this is where we truly define the JSONArray parameter
 
         mListingsAdapter = new ListingsAdapter(apartments);
         mListingsRecyclerView.setAdapter(mListingsAdapter);

@@ -69,8 +69,8 @@ public class ApartmentInventory {
 //your call to the Ruby API, get apartment essentially, basically the entire row across of data for that apartment
 //for CriminalIntent we got the UUID, TITLE, DATE, SOLVED, SUSPECT, etc
 //Really it all boils down to something along the lines of JSONObject or JSONArray (usually as a parameter variable
-// for example here it’s “json”) + getJSONObject (or Array) then .getString:
-    public List<Apartment> getApartmentList(JSONArray jsonArray) { //added the parameter
+// for example here it’s “json”) + getJSONObject (or Array) then .getString or .getInt etc:
+    public List<Apartment> getApartmentList(JSONArray jsonArray) { //added the parameter, placeholder for "apartments" array which contains all apts in our database
         //gutted
             // return mApartmentList;
 
@@ -79,20 +79,24 @@ public class ApartmentInventory {
 //for the below, recall that this is just diamond notation and equivalent to saying mApartmentList = new ArrayList<Apartment>();
         List<Apartment> apartmentList = new ArrayList<>();
 
-        String jsonString  = "";
         for(int i=0; i<jsonArray.length();i++){
 
-            //fix this to call the appropriate info from Ruby app
+            //calling the appropriate info from the Ruby API
 
             JSONObject json = null;
+
             try {
-                json = jsonArray.getJSONObject(i); //global method in JSONArray class; getJSONObject(int index)
-                jsonString = jsonString +
-                        "Name : "+json.getString("FirstName")+" "+json.getString("LastName")+"\n"+
-                        "Age : "+json.getInt("Age")+"\n"+
-                        "Mobile Using : "+json.getString("Mobile")+"\n\n";
-                Apartment apartment = new Apartment();
-                apartment.setApartmentText(jsonString);
+                json = jsonArray.getJSONObject(i); //get the JSONObject within the array and b/c its in a for loop it gets all of them one at a time;  global method in JSONArray class; getJSONObject(int index)
+
+                //if you want to show text alongside your database pull the query looks like
+                    //jsonString = jsonString +
+                    //"Name : "+json.getString("FirstName")+" "+json.getString("LastName")+"\n"+
+
+                Apartment apartment = new Apartment(UUID.fromString(json.getString("id") ) ); //UUID from String already converts our JSON string result into a UUID
+                apartment.setApartmentText(json.getInt("price") + " " + json.getInt("bedrooms") + " " + json.getInt("bathrooms") );
+                apartment.setApartmentLatitude(json.getJSONObject("building").getDouble("latitude"));
+                apartment.setApartmentLongitude(json.getJSONObject("building").getDouble("longitude"));
+
                 apartmentList.add(apartment);
 //note we may have to move the setApartmentText stuff above outside the for loop
             } catch (JSONException e) {
@@ -138,8 +142,13 @@ public class ApartmentInventory {
     }
 
 
+//added jsonarray as a second parameter post seeing Ruby API structure. May not be correct way to go about this
+    //strayed very far from the book / Criminal Intent here. Doesn't seem necessary to call to the Ruby API again? See pg 270 if this doesn't work
+        //here you're going to be looking for a specific apartment that's clicked on (so by its respective id)
+        // and you need to return all the results for that one apartment
+//the other way seems to involve adding jsonarray as a second parameter. however it doesnt seem to work in ApartmentFragment as onCreate can't throw JSONExceptions / ioExceptions for some reason
 
-    public Apartment getApartment(UUID id) {
+    public Apartment getApartment(UUID id) { //id is a placeholder here and gets a real value in ApartmentFragment when we call this method
         //gutted
             // for (Apartment apartment: mApartmentList) {
             //if(apartment.getId().equals(id) ) {
@@ -147,30 +156,26 @@ public class ApartmentInventory {
             //            }
             //        }
 
-//your call to the Ruby API; should be very similar to the getApartmentList method but here you only need to query for the UUID
-//you don't need an ArrayList here
+//trying to call Ruby API without using the jsonArray parameter / variable from getApartmentList
+//NOTE the try / catch is done to avoid having to throw JSONException in the method header, see http://developer.android.com/reference/org/json/JSONException.html
+//because that's a problem in ApartmentFragment. onCreate method can't do throws it seems
+     try {
+         JSONArray placeholderJsonAray = new JSONArray(); //does this make sense? creating a placeholderJsonArray to then call getJSONArray on and get the Array at position 0 , i.e. the first one
+         JSONArray realJsonArrayValue = placeholderJsonAray.getJSONArray(0);
+         List<Apartment> apartments = getApartmentList(realJsonArrayValue);
 
-        String jsonString  = "";
+         //reminder the colon is just a shorthand way of saying for each apartment in the List of Apartments
+         for (Apartment apartment : apartments) {
+             if (apartment.getId().equals(id)) {
+                 return apartment;
+                    }
+         }//end of for loop
+         return null; //i think this is essentially your else statement, if no apartment matches return null
+     } // end of try
 
-            //fix this to call the appropriate info from Ruby app
-
-            JSONObject json = null;
-            try {
-                jsonString = jsonString +
-                        "Name : "+json.getString("FirstName")+" "+json.getString("LastName")+"\n";
-//note we may have to move the setApartmentText stuff above outside the for loop
-            } catch (JSONException e) {
-                e.printStackTrace();
+     catch (JSONException jsonExceptionGetApartmentMethod) {
+         throw new RuntimeException(jsonExceptionGetApartmentMethod);
             }
-
-        if (jsonString ==null) {
-            return null;
-        }
-        else {
-            Apartment apartment = new Apartment(id);//id here is a placeholder and gets a real value in ApartmentFragment
-            apartment.setApartmentText(jsonString);
-            return apartment;
-                }
 
     }//end of getApartment method
 

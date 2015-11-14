@@ -32,6 +32,10 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+
+import java.io.IOException;
 import java.util.UUID;
 
 /**
@@ -69,10 +73,32 @@ public class ApartmentFragment extends Fragment {
         return fragment;
     }
 
+
+    //added this method to get a real JSonArray value for getApartment method within onCreate
+    private JSONArray getJsonArray() throws IOException, JSONException { //added the throws part
+        ApartmentInventory apartmentInventory = ApartmentInventory.get(getActivity());
+
+        //the JSONObject / JSONArray lines are really there to prevent a non-static method from a static context error in getApartmentList()
+        JSONArray placeholderJsonAray = new JSONArray(); //does this make sense? creating a placeholderJsonArray to then call getJSONArray on and get the Array at position 0 , i.e. the first one
+        JSONArray realJsonArrayValue = placeholderJsonAray.getJSONArray(0);
+
+        //something along these lines may be an alternative for the above
+        //we'd be constructing a JSONObject first because .getJSONArray requires an index instead of a string when you do JSONObject.getJSONArray
+        // JSONObject placeholderJsonObject = new JSONObject();
+        //JSONArray realJsonArrayValue = placeholderJsonObject.getJSONArray("apartments"); //this area is where we define JSONArray i.e. point to "apartments" in the API
+        return realJsonArrayValue;
+    }
+
+
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         UUID apartmentId = (UUID) getArguments().getSerializable(ARG_APARTMENT_ID);
+        //added these lines because i Added a parameter jsonArray to getApartment method. Based this off lines from ListingsFragment
+        //Here however, Don't think I need to pass a real value for JsonArray since this should get a real value in Apartment Inventory?
+        //the JSONObject / JSONArray lines are really there to prevent a non-static method from a static context error in getApartmentList()
+
         mApartment = ApartmentInventory.get(getActivity() ).getApartment(apartmentId);//former code that worked to pull up the view of one un-specific apartment --> mApartment = new Apartment();
 
 
