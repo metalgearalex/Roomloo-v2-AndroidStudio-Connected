@@ -51,8 +51,16 @@ public class Apartment {
     }
 
     //added to store location of apartment from Database for Google maps
+    public Double getApartmentLatitude () {
+        return mlatitude;
+            }
+
     public void setApartmentLatitude (Double latitude) {
         mlatitude = latitude;
+            }
+
+    public Double getApartmentLongitude () {
+        return mlongitude;
             }
 
     public void setApartmentLongitude (Double longitude) {

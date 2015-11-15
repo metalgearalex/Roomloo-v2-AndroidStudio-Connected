@@ -22,7 +22,7 @@ public class ApiConnector {
 
     public JSONArray GetAllCustomers() {
         // URL where your API is located
-        String url = "http://192.168.0.7/~tahseen0amin/Tutorial/getAllCustomers.php"; //change this to Ruby API location
+        String url = "http://www.roomloo.com/api/apartments"; //Ruby API location
 
         // Get HttpResponse Object from url.
         // Get HttpEntity from Http Response Object

@@ -194,13 +194,11 @@ public class ApartmentFragment extends Fragment {
 
                         googleMap.getUiSettings().setAllGesturesEnabled(true); //not necessary allows all gestures (moving the camera, rotating, etc)
 
-                        // Passing harcoded values for latitude & longitude. Need to make dynamic post integration with database
-                        latitude = 40.733460;
-                        longitude = -73.986400;
-
                         UUID apartmentId = (UUID) getArguments().getSerializable(ARG_APARTMENT_ID);
-                        ApartmentInventory apartmentInventory = new ApartmentInventory(getActivity() );//this line attempts to get rid of the non-static method / static context error. getActivity() returns the activity associated with a fragment. Activity is a context (since Activity extends Context)
-                        LatLng marker_latlng = new LatLng(apartmentInventory.getApartmentLatitude(apartmentId), apartmentInventory.getApartmentLongitude(apartmentId) );
+//i may need to add id as a parameter to getApartmentLatitude in the Apartment class and use apartmentId above
+//if not the idea is that all apartments get their latitude and longitude pulled from the API in ApartmentInventory.getApartmentList()
+//so you should just be able to pull the latitude and longitude placeholders in the Apartment class via the getApartmentLatitude() & Longitude methods
+                        LatLng marker_latlng = new LatLng(mApartment.getApartmentLatitude(), mApartment.getApartmentLongitude() );
 
                         //target = the location the camera is pointing at
                         //trying to replace with just position >> CameraPosition cameraPosition = new CameraPosition.Builder().target(marker_latlng).zoom(15.0f).build();

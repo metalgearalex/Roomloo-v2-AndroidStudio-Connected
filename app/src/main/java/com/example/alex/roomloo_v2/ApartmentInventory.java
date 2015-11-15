@@ -180,50 +180,5 @@ public class ApartmentInventory {
     }//end of getApartment method
 
 
-    //added this method to get location from database for Google Maps
-    //passing in the id so that the location it brings me is for one specific apartment
-    public double getApartmentLatitude (UUID id) {//id here is a placeholder and gets a real value in ApartmentFragment
-
-        Double jsonString  = null;
-
-        //fix this to call the appropriate info from Ruby app
-
-        JSONObject json = null;
-        try {
-            jsonString = json.getDouble(jsonString + "latitude: ");
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-
-            Apartment apartment= new Apartment(id);
-            apartment.setApartmentLatitude(jsonString);
-            return jsonString;
-
-
-    }//end of getApartmentLatitude method
-
-
-    //added this method to get location from database for Google Maps
-    //passing in the id so that the location it brings me is for one specific apartment
-    public double getApartmentLongitude (UUID id) { //id here is a placeholder and gets a real value in ApartmentFragment
-
-        Double jsonString  = null;
-
-        //fix this to call the appropriate info from Ruby app
-
-        JSONObject json = null;
-        try {
-            jsonString = json.getDouble(jsonString + "latitude: ");
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-
-        Apartment apartment= new Apartment(id);
-        apartment.setApartmentLatitude(jsonString);
-        return jsonString;
-
-
-    }//end of getApartmentLongitude method
-
 
 }
