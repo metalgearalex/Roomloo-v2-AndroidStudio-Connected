@@ -5,7 +5,6 @@
 package com.example.alex.roomloo_v2;
 
 import android.content.Context;
-import android.os.AsyncTask;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -21,6 +20,8 @@ import java.util.UUID;
 public class ApartmentInventory {
 
     private static ApartmentInventory sApartmentInventory; //a singleton, i.e. a class that allows only one instance of itself to be created
+    private Context mContext;
+    private List<Apartment> mApartmentList; //added for new method to try and get ApartmentInventory method to work properly / avoid nullpointer errors
     //gutted:  private List<Apartment> mApartmentList;
     //commenting this out again, i guess i was trying to connect straight to the heroku database with ksoap?
         //added for code to connect to web service layer
@@ -43,9 +44,22 @@ public class ApartmentInventory {
             }
 
 //getting our apartment inventory
+//context here refers to ListingsActivity
     public ApartmentInventory (Context context) { //changed to public to try to fix non-static method / static context in ApartmentFragment class within onCreateView method / GoogleMaps code
+        mContext = context.getApplicationContext();
+        List<Apartment> apartmentList = getApartmentList(jsonArray);
+//CriminalIntent used an Android helper class called SQLiteOpenHelper to open the database here. See page 259
+        //so open json here?
 
-        new GetAllCustomerTask().execute(new ApiConnector()); //maybe move this to one of your oncreate methods in your mainactivity?
+        //this didn't work either same nullpointer error >> ApiConnector api = new ApiConnector();
+
+        //the below 2 lines resulted in a NetworkOnMainThread error
+            //ApiConnector getAPI = new ApiConnector();
+            //getAPI.GetAllCustomers();
+
+        //prior attempt, probably wrong: List<Apartment> apartmentList = new ArrayList<>();
+
+        //something like this instead? ApartmentInventory apartmentInventory = ApartmentInventory.get(getActivity());
 
         //this is what CriminalIntent replaced the gutted stuff with:
         //seems unnecessary? doesnt seem like this method is called anywhere
@@ -112,35 +126,11 @@ public class ApartmentInventory {
 
             }//end of getApartmentList method
 
-
-    private class GetAllCustomerTask extends AsyncTask<ApiConnector,Long,JSONArray> //JSONArray here specifies the type of result you'll be sending back to the main thread
-    {
-        //the ... is a way to tell Android you have a   variable number of parameters
-        //params seems to be a common way to pass in a variable type or something along the lines
-        //U can then pass multiple items and just access like params[0].. etc..
-        @Override
-        protected JSONArray doInBackground(ApiConnector... params) {
-
-            // it is executed on Background thread
-
-            return params[0].GetAllCustomers(); //essentially returns your JSONArray
-        }
-
-
-        //reminder the ApiConnector class is really a giant JSONArray
-        //also the api returns the result in a variable called jsonArray
-        //and we get that in a JSONArray through the doInBackground method override within GetAllCustomerTask
-        //HOWEVER, SEEMS THE JSONArray/jsonArray in this whole tab is really just a placeholder the whole time and it
-        //gets a real value in ListingsFragment when we call getApartmentList()
-        @Override
-        protected void onPostExecute(JSONArray jsonArray) {
-
-            getApartmentList(jsonArray);
-
-
-        }
+//testing adding a new method that returns apartmentList for use in ApartmentInventory method
+    private List<Apartment> returnApartmentList() {
+        mApartmentList = getApartmentList();
+        return mApartmentList;
     }
-
 
 //added jsonarray as a second parameter post seeing Ruby API structure. May not be correct way to go about this
     //strayed very far from the book / Criminal Intent here. Doesn't seem necessary to call to the Ruby API again? See pg 270 if this doesn't work

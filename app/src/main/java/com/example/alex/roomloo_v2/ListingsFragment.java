@@ -2,6 +2,7 @@ package com.example.alex.roomloo_v2;
 
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
@@ -44,7 +45,40 @@ public class ListingsFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
+
+        new GetAllCustomerTask().execute(new ApiConnector());
+
     }
+
+    private class GetAllCustomerTask extends AsyncTask<ApiConnector,Long,JSONArray> //JSONArray here specifies the type of result you'll be sending back to the main thread
+    {
+        //the ... is a way to tell Android you have a variable number of parameters
+        //params seems to be a common way to pass in a variable type or something along the lines
+        //but note that params is still just a variable name. you can call it anything
+        //U can then pass multiple items and just access like params[0].. etc..
+        @Override
+        protected JSONArray doInBackground(ApiConnector... params) {
+
+            // it is executed on Background thread
+//See Android Programming Notes but parameters in an AsyncTask are always referenced as an array no matter how many you have. So calling params[0] is just referencing your single parameter here
+            return params[0].GetAllCustomers(); //essentially returns your JSONArray.
+//this is probably where my problem is. see page 425. but basically by now this shouldnt be a placeholder anymore. i need to actually get my real JSON values.
+        }
+
+
+        //reminder the ApiConnector class is really a giant JSONArray
+        //also the api returns the result in a variable called jsonArray
+        //and we get that in a JSONArray through the doInBackground method override within GetAllCustomerTask
+        //HOWEVER, SEEMS THE JSONArray/jsonArray in this whole tab is really just a placeholder the whole time and it
+        //gets a real value in ListingsFragment when we call getApartmentList()
+        @Override
+        protected void onPostExecute(JSONArray jsonArray) { //accepts as input the JSONArray you just returned inside doInBackground, in this case a JSONArray
+
+            ApartmentInventory apartmentInventory = new ApartmentInventory(getActivity() ); //not sure if getActivity is right here but think so
+            apartmentInventory.getApartmentList(jsonArray);
+                }
+
+    } // end of GetAllCustomerTask method
 
     //As soon as you create your RecyclerView you give it another object called LayoutManager.
     // This is required for it to work otherwise your app crashes.
