@@ -74,7 +74,7 @@ public class ApiConnector {
             }
         }
 
-        return jsonArray;
+        return jsonArray; //debugger shows this is still null
 
     } //end of public JSONArray GetAllCustomers() method
 
