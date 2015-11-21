@@ -60,10 +60,16 @@ public class ListingsFragment extends Fragment {
         protected JSONArray doInBackground(ApiConnector... params) {
 
             // it is executed on Background thread
-//See Android Programming Notes but parameters in an AsyncTask are always referenced as an array no matter how many you have. So calling params[0] is just referencing your single parameter here
-            return params[0].GetAllCustomers(); //essentially returns your JSONArray.
+//See Android Programming Notes but parameters in an AsyncTask are always referenced as an array no matter how many you have.
+// So calling params[0] is just referencing your single parameter here
+            ApiConnector getAPI = new ApiConnector();
+            JSONArray jsonArray = new JSONArray();
+            jsonArray = getAPI.GetAllCustomers();
+            return jsonArray;
+            //return params[0].GetAllCustomers(); //essentially returns your JSONArray.
 //this is probably where my problem is. see page 425. but basically by now this shouldnt be a placeholder anymore. i need to actually get my real JSON values.
         }
+
 
 
         //reminder the ApiConnector class is really a giant JSONArray

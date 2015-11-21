@@ -47,7 +47,16 @@ public class ApartmentInventory {
 //context here refers to ListingsActivity
     public ApartmentInventory (Context context) { //changed to public to try to fix non-static method / static context in ApartmentFragment class within onCreateView method / GoogleMaps code
         mContext = context.getApplicationContext();
-        List<Apartment> apartmentList = getApartmentList(jsonArray);
+        //the JSONObject / JSONArray lines are really there to prevent a non-static method from a static context error in getApartmentList()
+
+        try {
+            JSONArray placeholderJsonAray = new JSONArray(); //does this make sense? creating a placeholderJsonArray to then call getJSONArray on and get the Array at position 0 , i.e. the first one
+            JSONArray realJsonArrayValue = placeholderJsonAray.getJSONArray(0);
+            List<Apartment> apartmentList = getApartmentList(realJsonArrayValue);
+            }
+        catch (JSONException e) {
+        e.printStackTrace();
+            }
 //CriminalIntent used an Android helper class called SQLiteOpenHelper to open the database here. See page 259
         //so open json here?
 
@@ -126,11 +135,6 @@ public class ApartmentInventory {
 
             }//end of getApartmentList method
 
-//testing adding a new method that returns apartmentList for use in ApartmentInventory method
-    private List<Apartment> returnApartmentList() {
-        mApartmentList = getApartmentList();
-        return mApartmentList;
-    }
 
 //added jsonarray as a second parameter post seeing Ruby API structure. May not be correct way to go about this
     //strayed very far from the book / Criminal Intent here. Doesn't seem necessary to call to the Ruby API again? See pg 270 if this doesn't work
