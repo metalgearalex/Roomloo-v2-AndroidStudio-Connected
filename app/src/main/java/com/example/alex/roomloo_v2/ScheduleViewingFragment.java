@@ -16,8 +16,6 @@ import com.facebook.AccessToken;
 import com.facebook.CallbackManager;
 import com.facebook.FacebookSdk;
 
-import org.json.JSONArray;
-
 import java.util.Date;
 import java.util.UUID;
 
@@ -59,8 +57,7 @@ public class ScheduleViewingFragment extends Fragment {
         //previous code
             // mApartment = ApartmentInventory.get(getActivity() ).getApartment(apartmentId);
         ApiConnector apiConnector = new ApiConnector();
-        JSONArray jsonArray = apiConnector.GetAllCustomers();
-        mApartment = apiConnector.getApartment(apartmentId, jsonArray);
+        mApartment = apiConnector.getApartment(apartmentId);
 
 
         //FB related code here

@@ -103,8 +103,7 @@ public class ApartmentFragment extends Fragment {
         //prior code that worked:
         // mApartment = ApartmentInventory.get(getActivity() ).getApartment(apartmentId);//former code that worked to pull up the view of one un-specific apartment --> mApartment = new Apartment();
         ApiConnector apiConnector = new ApiConnector();
-        JSONArray jsonArray = apiConnector.GetAllCustomers();
-        mApartment = apiConnector.getApartment(apartmentId, jsonArray);
+        mApartment = apiConnector.getApartment(apartmentId);
 
         //FB related code here
 //originally was getContext() but that didn't work here. getActivity returns the activity associated with a fragment and the Activity is a context since Activity extends Context

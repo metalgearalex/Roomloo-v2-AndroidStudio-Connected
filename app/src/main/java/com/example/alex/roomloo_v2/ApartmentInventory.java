@@ -6,8 +6,6 @@ package com.example.alex.roomloo_v2;
 
 import android.content.Context;
 
-import org.json.JSONArray;
-
 import java.util.List;
 
 /**
@@ -35,8 +33,7 @@ public class ApartmentInventory {
         mContext = context.getApplicationContext();
 
         ApiConnector apiConnector = new ApiConnector();
-        JSONArray jsonArray = apiConnector.GetAllCustomers();
-        apiConnector.getApartmentList(jsonArray);
+        apiConnector.getApartmentList();
 
 
 //CriminalIntent used an Android helper class called SQLiteOpenHelper to open the database here. See page 259

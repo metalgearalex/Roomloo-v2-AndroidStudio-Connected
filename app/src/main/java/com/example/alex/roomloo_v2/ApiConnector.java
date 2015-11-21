@@ -5,17 +5,16 @@
 package com.example.alex.roomloo_v2;
 
 import android.util.Log;
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.util.EntityUtils;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -25,93 +24,87 @@ import java.util.UUID;
  */
 public class ApiConnector {
 
-    public JSONArray GetAllCustomers() {
-        // URL where your API is located
-        String url = "http://www.roomloo.com/api/apartments"; //Ruby API location
+    private static final String TAG = "ApiConnector";
 
-        // Get HttpResponse Object from url.
-        // Get HttpEntity from Http Response Object
+    //fetches raw data from a URL and returns it as an array of bytes
+    public byte[] getUrlBytes (String urlSpec) throws IOException {
+        URL url = new URL(urlSpec);
+        HttpURLConnection connection = (HttpURLConnection) url.openConnection(); //represents the connection
 
-        HttpEntity httpEntity = null;
-//HttpClient supports out of the box all HTTP methods defined in the HTTP/1.1 specification:
-// GET, HEAD, POST, PUT, DELETE, TRACE and OPTIONS. There is a specific class for each method type.:
-// HttpGet, HttpHead, HttpPost, HttpPut, HttpDelete, HttpTrace, and HttpOptions.
-        try
-        {
-            DefaultHttpClient httpClient = new DefaultHttpClient();  // Default Apache HttpClient
-            HttpGet httpGet = new HttpGet(url);
+        try{
+            ByteArrayOutputStream out = new ByteArrayOutputStream();
+            InputStream in = connection.getInputStream(); //however, until you call getInputStream on the HttpURLConnection you won't actually connect. so this is where we actually connect.
 
-            HttpResponse httpResponse = httpClient.execute(httpGet);
-//HTTP messages can carry a content entity associated with the request or response.
-            httpEntity = httpResponse.getEntity();
-
-        } catch (ClientProtocolException e) {
-
-            // Signals error in http protocol
-            e.printStackTrace();
-
-            //Log Errors Here
-
-        } catch (IOException e) {
-            e.printStackTrace();
-                }
-
-        // Convert HttpEntity into JSON Array
-        JSONArray jsonArray = null;
-
-        if (httpEntity != null) {
-            try {
-                String entityResponse = EntityUtils.toString(httpEntity);
-
-                Log.e("Entity Response  : ", entityResponse);
-
-                jsonArray = new JSONArray(entityResponse);
-
-            } catch (JSONException e) {
-                e.printStackTrace();
-            } catch (IOException e) {
-                e.printStackTrace();
+            if(connection.getResponseCode() != HttpURLConnection.HTTP_OK) {
+                throw new IOException(connection.getResponseMessage() + ": with " + urlSpec);
             }
+            //once you create your URL and open a connection you call read() repeatedly until your connection runs out of data
+            int bytesRead = 0;
+            byte[] buffer = new byte[1024];
+            while ((bytesRead = in.read(buffer)) > 0) {
+                out.write(buffer, 0, bytesRead);
+            }
+            out.close();
+            return out.toByteArray();
         }
 
-        return jsonArray; //debugger shows this is still null
+        finally {
+            connection.disconnect();
+        }
 
-    } //end of public JSONArray GetAllCustomers() method
+    }
 
+    //converts result from getUrlBytes(string) to a String
+    //this gets used in getApartmentList below
+    public String getUrlString(String urlSpec) throws IOException {
+        return new String(getUrlBytes(urlSpec) );
+            }
 
-    //SEEMS THE JSONArray/jsonArray in this whole tab is really just a placeholder the whole time and it
-//gets a real value in ListingsFragment when we call getApartmentList()
+    //request URL and fetches contents
+    public List <Apartment> getApartmentList() {
 
-    //your call to the Ruby API, get apartment essentially, basically the entire row across of data for that apartment
-//for CriminalIntent we got the UUID, TITLE, DATE, SOLVED, SUSPECT, etc
-//Really it all boils down to something along the lines of JSONObject or JSONArray (usually as a parameter variable
-// for example here it’s “json”) + getJSONObject (or Array) then .getString or .getInt etc:
-    public List<Apartment> getApartmentList(JSONArray jsonArray) { //parameter is the same JSONArray we get from our httprequest
-        //gutted
-        // return mApartmentList;
-
-        //reminder: ArrayLists collect objects of the same type
-        //you can modify arraylists with things like .set, .add, .remove
-//for the below, recall that this is just diamond notation and equivalent to saying mApartmentList = new ArrayList<Apartment>();
         List<Apartment> apartmentList = new ArrayList<>();
 
-        for(int i=0; i<jsonArray.length();i++){ //top nullpointer error
+        try {
+            String url = "http://www.roomloo.com/api/apartments";
 
-            //calling the appropriate info from the Ruby API
+            String jsonString = getUrlString(url); //getUrlString method is used; this is where our placeholder URL (String urlSpec) from getUrlBytes and getUrlString finally gets a real meaning
+            Log.i(TAG, "Received JSON: " + jsonString);
+            JSONObject jsonObject = new JSONObject(jsonString); //this was formerly a JSONArray but got an error saying value of type JSONObject cannot be converted to JSONArray
+            parseApartmentList(apartmentList, jsonObject); //calling the parseApartmentList method defined below
+        }
+        catch (JSONException je) {
+            Log.e(TAG, "Failed to parse JSON", je);
+        }
+        catch (IOException ioe) {
+            Log.e(TAG, "Failed to fetch apartments - IOException", ioe); //this is getting triggered, prob due to jsonobject vs. jsonarray issue
+        }
+        return apartmentList; //debugger says size = 0
+    }
 
-            JSONObject json = null;
+
+    //pulls out information for each Apartment.
+// makes an Apartment for each and adds it to a List
+//the method is called above in getApartmentList()
+    // Flickr's JSONObject is called "photos" and it contains a JSONArray called "photo" each with an "id" and representing a single photo
+
+    private void parseApartmentList(List<Apartment> apartmentList, JSONObject jsonObject) throws IOException, JSONException {
+        JSONArray apartmentsJsonArray = jsonObject.getJSONArray("apartments");
+
+        for (int i=0; i<=apartmentsJsonArray.length(); i++) { //added an equals sign because debugger says size of my apartmentlist array is 0
+
 
             try {
-                json = jsonArray.getJSONObject(i); //get the JSONObject within the array and b/c its in a for loop it gets all of them one at a time;  global method in JSONArray class; getJSONObject(int index)
+                JSONObject apartmentJsonObject = apartmentsJsonArray.getJSONObject(i); //get the JSONObject within the array and b/c its in a for loop it gets all of them one at a time;  global method in JSONArray class; getJSONObject(int index)
 
                 //if you want to show text alongside your database pull the query looks like
                 //jsonString = jsonString +
                 //"Name : "+json.getString("FirstName")+" "+json.getString("LastName")+"\n"+
 
-                Apartment apartment = new Apartment(UUID.fromString(json.getString("id")) ); //UUID from String already converts our JSON string result into a UUID
-                apartment.setApartmentText(json.getInt("price") + " " + json.getInt("bedrooms") + " " + json.getInt("bathrooms") );
-                apartment.setApartmentLatitude(json.getJSONObject("building").getDouble("latitude"));
-                apartment.setApartmentLongitude(json.getJSONObject("building").getDouble("longitude"));
+                Apartment apartment = new Apartment(UUID.fromString(apartmentJsonObject.getString("id")) ); //UUID from String already converts our JSON string result into a UUID
+                apartment.setApartmentText(apartmentJsonObject.getInt("price") + " " + apartmentJsonObject.getInt("bedrooms") + " " + apartmentJsonObject.getInt("bathrooms") );
+                apartment.setApartmentLatitude(apartmentJsonObject.getJSONObject("building").getDouble("latitude"));
+                apartment.setApartmentLongitude(apartmentJsonObject.getJSONObject("building").getDouble("longitude"));
 
                 apartmentList.add(apartment);
 //note we may have to move the setApartmentText stuff above outside the for loop
@@ -121,27 +114,17 @@ public class ApiConnector {
 
         }//end of for loop
 
-        return apartmentList;
 
-        //then set the Text based on those values -- Seems unnecessary since this is my model class vs. the Activity class in the tutorial?
-        //this.responseTextView.setText(s);
-
-    }//end of getApartmentList method
+    } // end of parseApartmentList
 
 
-//added jsonarray as a second parameter post seeing Ruby API structure. May not be correct way to go about this
-    //strayed very far from the book / Criminal Intent here. Doesn't seem necessary to call to the Ruby API again? See pg 270 if this doesn't work
-    //here you're going to be looking for a specific apartment that's clicked on (so by its respective id)
-    // and you need to return all the results for that one apartment
-//the other way seems to involve adding jsonarray as a second parameter. however it doesnt seem to work in ApartmentFragment as onCreate can't throw JSONExceptions / ioExceptions for some reason
-
-    public Apartment getApartment(UUID id, JSONArray jsonArray) { //id is a placeholder here and gets a real value in ApartmentFragment when we call this method
+    public Apartment getApartment(UUID id) { //id is a placeholder here and gets a real value in ApartmentFragment when we call this method
 
 //trying to call Ruby API without using the jsonArray parameter / variable from getApartmentList
 //NOTE the try / catch is done to avoid having to throw JSONException in the method header, see http://developer.android.com/reference/org/json/JSONException.html
 //because that's a problem in ApartmentFragment. onCreate method can't do throws it seems
 
-            List<Apartment> apartments = getApartmentList(jsonArray);
+            List<Apartment> apartments = getApartmentList();
 
             //reminder the colon is just a shorthand way of saying for each apartment in the List of Apartments
             for (Apartment apartment : apartments) {
