@@ -16,6 +16,8 @@ import com.facebook.AccessToken;
 import com.facebook.CallbackManager;
 import com.facebook.FacebookSdk;
 
+import org.json.JSONArray;
+
 import java.util.Date;
 import java.util.UUID;
 
@@ -53,7 +55,12 @@ public class ScheduleViewingFragment extends Fragment {
         super.onCreate(savedInstanceState);
         //to enable passing data to your Dialog Fragments - see pg 199
         UUID apartmentId = (UUID) getArguments().getSerializable(ARG_APARTMENT_ID_SCHEDULER);
-        mApartment = ApartmentInventory.get(getActivity() ).getApartment(apartmentId);
+
+        //previous code
+            // mApartment = ApartmentInventory.get(getActivity() ).getApartment(apartmentId);
+        ApiConnector apiConnector = new ApiConnector();
+        JSONArray jsonArray = apiConnector.GetAllCustomers();
+        mApartment = apiConnector.getApartment(apartmentId, jsonArray);
 
 
         //FB related code here

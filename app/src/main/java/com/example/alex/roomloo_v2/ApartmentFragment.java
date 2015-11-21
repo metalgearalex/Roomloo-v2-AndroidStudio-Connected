@@ -99,8 +99,12 @@ public class ApartmentFragment extends Fragment {
         //Here however, Don't think I need to pass a real value for JsonArray since this should get a real value in Apartment Inventory?
         //the JSONObject / JSONArray lines are really there to prevent a non-static method from a static context error in getApartmentList()
 
-        mApartment = ApartmentInventory.get(getActivity() ).getApartment(apartmentId);//former code that worked to pull up the view of one un-specific apartment --> mApartment = new Apartment();
 
+        //prior code that worked:
+        // mApartment = ApartmentInventory.get(getActivity() ).getApartment(apartmentId);//former code that worked to pull up the view of one un-specific apartment --> mApartment = new Apartment();
+        ApiConnector apiConnector = new ApiConnector();
+        JSONArray jsonArray = apiConnector.GetAllCustomers();
+        mApartment = apiConnector.getApartment(apartmentId, jsonArray);
 
         //FB related code here
 //originally was getContext() but that didn't work here. getActivity returns the activity associated with a fragment and the Activity is a context since Activity extends Context

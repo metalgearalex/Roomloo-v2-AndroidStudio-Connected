@@ -16,10 +16,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import org.json.JSONArray;
-import org.json.JSONException;
 
 import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.util.List;
 
 /**
@@ -28,6 +26,7 @@ import java.util.List;
 public class ListingsFragment extends Fragment {
     private RecyclerView mListingsRecyclerView;
     private ListingsAdapter mListingsAdapter; //used to set your Adapter
+    private List<Apartment> mApartmentList;
 
 //not sure if I still need this - probably not? -- seems like no not in the final criminalintent listfragment
     //public static ListingsFragment newInstance() {
@@ -46,31 +45,23 @@ public class ListingsFragment extends Fragment {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
 
-        new GetAllCustomerTask().execute(new ApiConnector());
+        new GetAllCustomerTask().execute();
 
     }
-
-    private class GetAllCustomerTask extends AsyncTask<ApiConnector,Long,JSONArray> //JSONArray here specifies the type of result you'll be sending back to the main thread
+//method has nullpointer error
+    private class GetAllCustomerTask extends AsyncTask<ApiConnector,Long,List<Apartment> > //JSONArray here specifies the type of result you'll be sending back to the main thread
     {
         //the ... is a way to tell Android you have a variable number of parameters
         //params seems to be a common way to pass in a variable type or something along the lines
         //but note that params is still just a variable name. you can call it anything
         //U can then pass multiple items and just access like params[0].. etc..
         @Override
-        protected JSONArray doInBackground(ApiConnector... params) {
-
-            // it is executed on Background thread
-//See Android Programming Notes but parameters in an AsyncTask are always referenced as an array no matter how many you have.
-// So calling params[0] is just referencing your single parameter here
+        protected List <Apartment> doInBackground(ApiConnector... params) {
             ApiConnector getAPI = new ApiConnector();
             JSONArray jsonArray = new JSONArray();
             jsonArray = getAPI.GetAllCustomers();
-            return jsonArray;
-            //return params[0].GetAllCustomers(); //essentially returns your JSONArray.
-//this is probably where my problem is. see page 425. but basically by now this shouldnt be a placeholder anymore. i need to actually get my real JSON values.
+            return new ApiConnector().getApartmentList(jsonArray); //nullpointer error
         }
-
-
 
         //reminder the ApiConnector class is really a giant JSONArray
         //also the api returns the result in a variable called jsonArray
@@ -78,10 +69,8 @@ public class ListingsFragment extends Fragment {
         //HOWEVER, SEEMS THE JSONArray/jsonArray in this whole tab is really just a placeholder the whole time and it
         //gets a real value in ListingsFragment when we call getApartmentList()
         @Override
-        protected void onPostExecute(JSONArray jsonArray) { //accepts as input the JSONArray you just returned inside doInBackground, in this case a JSONArray
-
-            ApartmentInventory apartmentInventory = new ApartmentInventory(getActivity() ); //not sure if getActivity is right here but think so
-            apartmentInventory.getApartmentList(jsonArray);
+        protected void onPostExecute(List<Apartment> apartmentList) { //accepts as input the JSONArray you just returned inside doInBackground, in this case a JSONArray
+            mApartmentList = apartmentList;
                 }
 
     } // end of GetAllCustomerTask method
@@ -97,33 +86,35 @@ public class ListingsFragment extends Fragment {
         mListingsRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity())); //there are other types of LayoutManagers available too like a GridLayoutManager
 
         //had to add try / finally because updateUI can now throw IOExceptions / JSONExceptions
-        try {
-            updateUI();
-        }
-        finally {
+//gutted for now
+//        try {
+//            updateUI();
+//        }
+//        finally {
             return view;
-        }
+//        }
             }
 
 
 
-    private void updateUI() throws IOException, JSONException { //added the throws part
-        ApartmentInventory apartmentInventory = ApartmentInventory.get(getActivity());
+//gutted for now
+//   private void updateUI() throws IOException, JSONException { //added the throws part
+//        ApartmentInventory apartmentInventory = ApartmentInventory.get(getActivity());
 
         //the JSONObject / JSONArray lines are really there to prevent a non-static method from a static context error in getApartmentList()
-        JSONArray placeholderJsonAray = new JSONArray(); //does this make sense? creating a placeholderJsonArray to then call getJSONArray on and get the Array at position 0 , i.e. the first one
-        JSONArray realJsonArrayValue = placeholderJsonAray.getJSONArray(0);
+//        JSONArray placeholderJsonAray = new JSONArray(); //does this make sense? creating a placeholderJsonArray to then call getJSONArray on and get the Array at position 0 , i.e. the first one
+//        JSONArray realJsonArrayValue = placeholderJsonAray.getJSONArray(0);
 
         //something along these lines may be an alternative for the above
         //we'd be constructing a JSONObject first because .getJSONArray requires an index instead of a string when you do JSONObject.getJSONArray
              // JSONObject placeholderJsonObject = new JSONObject();
             //JSONArray realJsonArrayValue = placeholderJsonObject.getJSONArray("apartments"); //this area is where we define JSONArray i.e. point to "apartments" in the API
 
-        List <Apartment> apartments = apartmentInventory.getApartmentList(realJsonArrayValue);//seems like this is where we truly define the JSONArray parameter
+//        List <Apartment> apartments = apartmentInventory.getApartmentList(realJsonArrayValue);//seems like this is where we truly define the JSONArray parameter
 
-        mListingsAdapter = new ListingsAdapter(apartments);
-        mListingsRecyclerView.setAdapter(mListingsAdapter);
-            }
+//        mListingsAdapter = new ListingsAdapter(apartments);
+//        mListingsRecyclerView.setAdapter(mListingsAdapter);
+//            }
 
 
     //creating a ViewHolder, which holds onto the view
