@@ -12,8 +12,6 @@ import android.support.v4.app.FragmentManager;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 
-import java.util.UUID;
-
 /**
  * Created by Alex on 9/18/2015.
  */
@@ -29,7 +27,7 @@ public class ApartmentActivity extends SingleFragmentActivity {
    private static final String EXTRA_APARTMENT_ID ="com.example.alex.roomloo_v2.Apartment.Apartment_mId"; //if something wrong it's because this isn't the right mapping. see pg 195. also pg 199 they changed it to private
    private static final int REQUEST_ERROR = 0; //for Google Maps error check
 
-    public static Intent newIntent(Context packageContext, UUID apartmentId) { //Reminder: Context argument specifies which application package the activity class can be found in
+    public static Intent newIntent(Context packageContext, int apartmentId) { //Reminder: Context argument specifies which application package the activity class can be found in
         Intent intent = new Intent(packageContext, ApartmentActivity.class);
         intent.putExtra(EXTRA_APARTMENT_ID, apartmentId); //first value of Intent.putExtra is always a String;
         return intent;
@@ -45,7 +43,7 @@ public class ApartmentActivity extends SingleFragmentActivity {
     public static FragmentManager fragmentManager;
     @Override
     protected Fragment createFragment() {
-        UUID apartmentId = (UUID) getIntent().getSerializableExtra(EXTRA_APARTMENT_ID);
+        int apartmentId = (int) getIntent().getSerializableExtra(EXTRA_APARTMENT_ID);
         return ApartmentFragment.newInstance(apartmentId);
             }
 

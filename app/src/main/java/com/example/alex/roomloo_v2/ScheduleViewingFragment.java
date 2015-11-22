@@ -17,7 +17,6 @@ import com.facebook.CallbackManager;
 import com.facebook.FacebookSdk;
 
 import java.util.Date;
-import java.util.UUID;
 
 /**
  * Created by Alex on 9/22/2015.
@@ -37,7 +36,7 @@ public class ScheduleViewingFragment extends Fragment {
     //actually attaching arguments bundle to a fragment
     //here we're stashing the crime ID someplace and that someplace is in its bundle
     //in what is called its arguments (the key-value pair)
-    public static ScheduleViewingFragment newInstance(UUID apartmentId) {
+    public static ScheduleViewingFragment newInstance(int apartmentId) {
         Bundle args = new Bundle();
         args.putSerializable(ARG_APARTMENT_ID_SCHEDULER, apartmentId); //string key, serializable value
 
@@ -52,7 +51,7 @@ public class ScheduleViewingFragment extends Fragment {
     public void onCreate (Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         //to enable passing data to your Dialog Fragments - see pg 199
-        UUID apartmentId = (UUID) getArguments().getSerializable(ARG_APARTMENT_ID_SCHEDULER);
+        int apartmentId = (int) getArguments().getSerializable(ARG_APARTMENT_ID_SCHEDULER);
 
         //previous code
             // mApartment = ApartmentInventory.get(getActivity() ).getApartment(apartmentId);

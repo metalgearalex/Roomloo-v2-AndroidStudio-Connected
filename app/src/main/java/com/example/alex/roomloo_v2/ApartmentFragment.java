@@ -36,7 +36,6 @@ import org.json.JSONArray;
 import org.json.JSONException;
 
 import java.io.IOException;
-import java.util.UUID;
 
 /**
  * Created by Alex on 9/18/2015.
@@ -64,7 +63,7 @@ public class ApartmentFragment extends Fragment {
     //to retrieve an extra (i.e. which apartment is this that we're showing?)
     //basically stashing the data(apartment's id) in its arguments bundle
     //To attach the arguments bundle to a fragment you call Fragment.setArguments(Bundle)
-    public static ApartmentFragment newInstance (UUID apartmentId) {
+    public static ApartmentFragment newInstance (int apartmentId) {
         Bundle args = new Bundle();
         args.putSerializable(ARG_APARTMENT_ID, apartmentId);
 
@@ -94,7 +93,7 @@ public class ApartmentFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        UUID apartmentId = (UUID) getArguments().getSerializable(ARG_APARTMENT_ID);
+        int apartmentId = (int) getArguments().getSerializable(ARG_APARTMENT_ID);
         //added these lines because i Added a parameter jsonArray to getApartment method. Based this off lines from ListingsFragment
         //Here however, Don't think I need to pass a real value for JsonArray since this should get a real value in Apartment Inventory?
         //the JSONObject / JSONArray lines are really there to prevent a non-static method from a static context error in getApartmentList()
@@ -197,7 +196,7 @@ public class ApartmentFragment extends Fragment {
 
                         googleMap.getUiSettings().setAllGesturesEnabled(true); //not necessary allows all gestures (moving the camera, rotating, etc)
 
-                        UUID apartmentId = (UUID) getArguments().getSerializable(ARG_APARTMENT_ID);
+                        int apartmentId = (int) getArguments().getSerializable(ARG_APARTMENT_ID);
 //i may need to add id as a parameter to getApartmentLatitude in the Apartment class and use apartmentId above
 //if not the idea is that all apartments get their latitude and longitude pulled from the API in ApartmentInventory.getApartmentList()
 //so you should just be able to pull the latitude and longitude placeholders in the Apartment class via the getApartmentLatitude() & Longitude methods

@@ -17,7 +17,6 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 /**
  * Created by Alex on 10/24/2015.
@@ -109,8 +108,7 @@ public class ApiConnector {
                         //But you can convert Int to String with String.valueof(your int value)
                 //THE PROBLEM is apartmentsJsonArray and apartmentJsonObject get you the same thing so when you look for your UUID its not unique, each # shows up twice
                 Integer idInt = apartmentJsonObject.getInt("id");
-                String idString = String.valueOf(idInt);
-                Apartment apartment = new Apartment(UUID.fromString(idString) ); //UUID from String already converts our JSON string result into a UUID
+                Apartment apartment = new Apartment(idInt); //UUID from String already converts our JSON string result into a UUID
 
                 apartment.setApartmentText(apartmentJsonObject.getInt("price") + " " + apartmentJsonObject.getInt("bedrooms") + " " + apartmentJsonObject.getInt("bathrooms") );
                 apartment.setApartmentLatitude(apartmentJsonObject.getJSONObject("building").getDouble("latitude"));
@@ -128,7 +126,7 @@ public class ApiConnector {
     } // end of parseApartmentList
 
 
-    public Apartment getApartment(UUID id) { //id is a placeholder here and gets a real value in ApartmentFragment when we call this method
+    public Apartment getApartment(int id) { //id is a placeholder here and gets a real value in ApartmentFragment when we call this method
 
 //trying to call Ruby API without using the jsonArray parameter / variable from getApartmentList
 //NOTE the try / catch is done to avoid having to throw JSONException in the method header, see http://developer.android.com/reference/org/json/JSONException.html

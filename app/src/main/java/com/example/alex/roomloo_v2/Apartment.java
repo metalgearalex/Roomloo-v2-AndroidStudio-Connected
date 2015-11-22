@@ -3,13 +3,12 @@
 package com.example.alex.roomloo_v2;
 
 import java.util.Date;
-import java.util.UUID;
 
 /**
  * Created by Alex on 9/17/2015.
  */
 public class Apartment {
-    private UUID mId;
+    private int mId;
     private String mApartmentText;
     private Date mDate;
     private double mlatitude; //added for database -> Google Map
@@ -20,16 +19,17 @@ public class Apartment {
             //return "IMG_" + getId().toString() + ".jpg";
                 //}
 
-    public Apartment() {
-        //Generate unique identifier
-        this(UUID.randomUUID());
-    }
+//gutted this for now
+//    public Apartment() {
+//        //Generate unique identifier
+//        this(UUID.randomUUID());
+//            }
 
-    public Apartment(UUID id) {
+    public Apartment(int id) {
         mId = id;
             }
 
-    public UUID getId() {
+    public Integer getId() {
         return mId;
     }
 
