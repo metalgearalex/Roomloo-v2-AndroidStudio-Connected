@@ -60,7 +60,7 @@ public class ListingsFragment extends Fragment {
         protected List <Apartment> doInBackground(ApiConnector... params) {
 
             return new ApiConnector().getApartmentList(); //nullpointer error
-        }
+                }
 
         //reminder the ApiConnector class is really a giant JSONArray
         //also the api returns the result in a variable called jsonArray
