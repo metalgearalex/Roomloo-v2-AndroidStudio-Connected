@@ -49,7 +49,7 @@ public class ListingsFragment extends Fragment {
         new GetAllCustomerTask().execute();
 
     }
-//method has nullpointer error
+
     private class GetAllCustomerTask extends AsyncTask<ApiConnector,Long,List<Apartment> > //JSONArray here specifies the type of result you'll be sending back to the main thread
     {
         //the ... is a way to tell Android you have a variable number of parameters
@@ -59,7 +59,7 @@ public class ListingsFragment extends Fragment {
         @Override
         protected List <Apartment> doInBackground(ApiConnector... params) {
 
-            return new ApiConnector().getApartmentList(); //nullpointer error
+            return new ApiConnector().getApartmentList();
                 }
 
         //reminder the ApiConnector class is really a giant JSONArray
@@ -70,6 +70,9 @@ public class ListingsFragment extends Fragment {
         @Override
         protected void onPostExecute(List<Apartment> apartmentList) { //accepts as input the JSONArray you just returned inside doInBackground, in this case a JSONArray
             mApartmentList = apartmentList;
+            //this is necessary to get your actual list to show up on the user's screen
+            mListingsAdapter = new ListingsAdapter(apartmentList);
+            mListingsRecyclerView.setAdapter(mListingsAdapter);
                 }
 
     } // end of GetAllCustomerTask method

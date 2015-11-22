@@ -19,11 +19,17 @@ public class Apartment {
             //return "IMG_" + getId().toString() + ".jpg";
                 //}
 
-//gutted this for now
+//gutted for now.
 //    public Apartment() {
-//        //Generate unique identifier
-//        this(UUID.randomUUID());
+        //Generate unique identifier
+//        this(UUID.randomUUID() );
+
+        //something along these lines may work if we ungut it
+            //Random generator = new Random();
+            //int randomIntegerId = generator.nextInt(2000000000); //hardcode. gives you an integer between 0 and n-1. this is more or less the biggest number it lets you input
 //            }
+
+
 
     public Apartment(int id) {
         mId = id;
