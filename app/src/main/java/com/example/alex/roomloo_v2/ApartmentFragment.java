@@ -4,6 +4,7 @@ package com.example.alex.roomloo_v2;
 
 
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -88,21 +89,15 @@ public class ApartmentFragment extends Fragment {
         return realJsonArrayValue;
     }
 
-
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         int apartmentId = (int) getArguments().getSerializable(ARG_APARTMENT_ID);
-        //added these lines because i Added a parameter jsonArray to getApartment method. Based this off lines from ListingsFragment
-        //Here however, Don't think I need to pass a real value for JsonArray since this should get a real value in Apartment Inventory?
-        //the JSONObject / JSONArray lines are really there to prevent a non-static method from a static context error in getApartmentList()
-
 
         //prior code that worked:
         // mApartment = ApartmentInventory.get(getActivity() ).getApartment(apartmentId);//former code that worked to pull up the view of one un-specific apartment --> mApartment = new Apartment();
-        ApiConnector apiConnector = new ApiConnector();
-        mApartment = apiConnector.getApartment(apartmentId);
+
+        new GetApartmentTask().execute();
 
         //FB related code here
 //originally was getContext() but that didn't work here. getActivity returns the activity associated with a fragment and the Activity is a context since Activity extends Context
@@ -135,7 +130,7 @@ public class ApartmentFragment extends Fragment {
         mAccessTokenTracker.startTracking();
         mProfileTracker.startTracking();
 
-    }
+    }//end of onCreate
 
 
     //to check if the user is logged-in
@@ -145,6 +140,7 @@ public class ApartmentFragment extends Fragment {
         mAccessToken = AccessToken.getCurrentAccessToken(); //this is the FB method for seeing if someone is logged-in
         return mAccessToken != null;
     }
+
 
     //method for if you're logged in, let the schedule button work, if not don't
     private void updateToken (AccessToken currentAccessToken) {
@@ -169,6 +165,34 @@ public class ApartmentFragment extends Fragment {
             });
         }
     }
+
+    //to avoid a networkonmainthreaderror
+    private class GetApartmentTask extends AsyncTask<ApiConnector,Long,Apartment > //JSONArray here specifies the type of result you'll be sending back to the main thread
+    {
+        //the ... is a way to tell Android you have a variable number of parameters
+        //params seems to be a common way to pass in a variable type or something along the lines
+        //but note that params is still just a variable name. you can call it anything
+        //U can then pass multiple items and just access like params[0].. etc..
+        @Override
+        protected Apartment doInBackground(ApiConnector... params) {
+            int apartmentId = (int) getArguments().getSerializable(ARG_APARTMENT_ID); //this results in the correct apt id
+            return new ApiConnector().getApartment(apartmentId); //mApartment is null here. maybe its a problem with ApiConnector?
+                }
+
+        //reminder the ApiConnector class is really a giant JSONArray
+        //also the api returns the result in a variable called jsonArray
+        //and we get that in a JSONArray through the doInBackground method override within GetAllCustomerTask
+        //HOWEVER, SEEMS THE JSONArray/jsonArray in this whole tab is really just a placeholder the whole time and it
+        //gets a real value in ListingsFragment when we call getApartmentList()
+        @Override
+        protected void onPostExecute(Apartment apartment) { //accepts as input the value you just returned inside doInBackground, in this case an Apartment
+            mApartment = apartment;
+            //this is necessary to get your actual list to show up on the user's screen at least in ListingsFragment
+            //mListingsAdapter = new ListingsAdapter(apartmentList);
+            //mListingsRecyclerView.setAdapter(mListingsAdapter);
+                }
+
+    } // end of GetAllCustomerTask method
 
 
     //to explicitly inflate the fragment's view. basically just calling LayoutInflater.inflate(....) and passing in the layout resource ID
@@ -235,7 +259,8 @@ public class ApartmentFragment extends Fragment {
         //end of Google Maps Code in onCreateView at least
 
         mApartmentTextView = (TextView) v.findViewById(R.id.details_page_apartment_text);
-        mApartmentTextView.setText(mApartment.getApartmentText()); //yes this works and is necessary to show the apartment text on the specific-apartment-view's page. Oddly enough, sometimes Android gets a nullpointerexception with this line, if you get it just temporarily comment out this line so you  can see what the real error is
+        //temporarily commenting out
+            mApartmentTextView.setText(mApartment.getApartmentText() ); //yes this works and is necessary to show the apartment text on the specific-apartment-view's page. Oddly enough, sometimes Android gets a nullpointerexception with this line, if you get it just temporarily comment out this line so you  can see what the real error is
 
         //trying to get a compressed image to show up
         mApartmentImageView = (ImageView) v.findViewById(R.id.details_page_apartment_picture);
@@ -250,8 +275,6 @@ public class ApartmentFragment extends Fragment {
         //here we're starting an activity from a fragment using an explicit intent and then calling Fragment.startActivity(intent)
         //specifically we're calling the right apartment to show by calling the newIntent method we defined in ScheduleViewingActivity and getting Id from our Apartment model layer as well
         updateToken(AccessToken.getCurrentAccessToken() );
-
-
 
         //FB log-in button
         mFbLoginButton = (LoginButton) v.findViewById(R.id.login_button);

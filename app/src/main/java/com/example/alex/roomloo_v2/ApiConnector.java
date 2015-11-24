@@ -79,7 +79,7 @@ public class ApiConnector {
         catch (IOException ioe) {
             Log.e(TAG, "Failed to fetch apartments - IOException", ioe); //this is getting triggered, prob due to jsonobject vs. jsonarray issue
         }
-        return apartmentList; //debugger says size = 0
+        return apartmentList;
     }
 
 
@@ -126,26 +126,79 @@ public class ApiConnector {
     } // end of parseApartmentList
 
 
-    public Apartment getApartment(int id) { //id is a placeholder here and gets a real value in ApartmentFragment when we call this method
+//request URL and fetches contents
+public Apartment getApartment(int idInt) {
 
-//trying to call Ruby API without using the jsonArray parameter / variable from getApartmentList
-//NOTE the try / catch is done to avoid having to throw JSONException in the method header, see http://developer.android.com/reference/org/json/JSONException.html
-//because that's a problem in ApartmentFragment. onCreate method can't do throws it seems
+    List<Apartment> apartmentList = new ArrayList<>();
+    //commenting out to try for loop instead: Apartment apartment = new Apartment(idInt);
 
-            List<Apartment> apartments = getApartmentList();
+    try {
+        String url = "http://www.roomloo.com/api/apartments";
 
-            //reminder the colon is just a shorthand way of saying for each apartment in the List of Apartments
-            for (Apartment apartment : apartments) {
-                if (apartment.getId().equals(id)) {
-                    return apartment;
+        String jsonString = getUrlString(url); //getUrlString method is used; this is where our placeholder URL (String urlSpec) from getUrlBytes and getUrlString finally gets a real meaning
+        Log.i(TAG, "Received JSON: " + jsonString);
+        JSONObject jsonObject = new JSONObject(jsonString); //this was formerly a JSONArray but got an error saying value of type JSONObject cannot be converted to JSONArray
+        JSONArray jsonArray = jsonObject.getJSONArray("apartments"); //trying to convert my JSONObject into a JSONArray and then really only use this going forward to avoid double counting the arraylist items
+        parseApartmentList(apartmentList, jsonArray); //calling the parseApartmentList method defined below
+    }
+    catch (JSONException je) {
+        Log.e(TAG, "Failed to parse JSON", je);
+    }
+    catch (IOException ioe) {
+        Log.e(TAG, "Failed to fetch apartments - IOException", ioe); //this is getting triggered, prob due to jsonobject vs. jsonarray issue
+    }
+
+    for (Apartment apartment : apartmentList) {
+        if (apartment.getId().equals(idInt)) {
+            return apartment; //this has a value here per debugger
                 }
-            }//end of for loop
-            return null; //i think this is essentially your else statement, if no apartment matches return null
+    }//end of for loop
+    Apartment apartment = new Apartment(idInt);
+    return apartment; //mApartmentText etc has a value here. apartment is successfully returned
+}
 
-    }//end of getApartment method
+
+    //pulls out information for each Apartment.
+// makes an Apartment for each and adds it to a List
+//the method is called above in getApartmentList()
+    // Flickr's JSONObject is called "photos" and it contains a JSONArray called "photo" each with an "id" and representing a single photo
+
+    //per debugger, jsonObject here is actually the real JSON as is apartmentsJsonArray which is everything inside of the brackets in the apartments array
+    private void parseApartment(List<Apartment> apartmentList, JSONArray jsonArray) throws IOException, JSONException {
+
+        for (int i=0; i<=jsonArray.length(); i++) { //added an equals sign because debugger says size of my apartmentlist array is 0
+
+            try {
+                //the problem is apartmentsJsonArray and apartmentJsonObject get you the same thing so when you look for your UUID its not unique, each # shows up twice
+
+                JSONObject apartmentJsonObject = jsonArray.getJSONObject(i); //get the JSONObject within the array and b/c its in a for loop it gets all of them one at a time;  global method in JSONArray class; getJSONObject(int index)
+
+                //if you want to show text alongside your database pull the query looks like
+                //jsonString = jsonString +
+                //"Name : "+json.getString("FirstName")+" "+json.getString("LastName")+"\n"+
+
+                //original code to get apt id>> Apartment apartment = new Apartment(UUID.fromString(apartmentJsonObject.getString("id")) ); //UUID from String already converts our JSON string result into a UUID
+                //problem is it's not a string in the actual JSON / API it's an int
+                //you can't convert directly from Int to UUID
+                //But you can convert Int to String with String.valueof(your int value)
+                //THE PROBLEM is apartmentsJsonArray and apartmentJsonObject get you the same thing so when you look for your UUID its not unique, each # shows up twice
+                Integer idInt = apartmentJsonObject.getInt("id");
+                Apartment apartment = new Apartment(idInt); //UUID from String already converts our JSON string result into a UUID
+
+                apartment.setApartmentText(apartmentJsonObject.getInt("price") + " " + apartmentJsonObject.getInt("bedrooms") + " " + apartmentJsonObject.getInt("bathrooms") );
+                apartment.setApartmentLatitude(apartmentJsonObject.getJSONObject("building").getDouble("latitude"));
+                apartment.setApartmentLongitude(apartmentJsonObject.getJSONObject("building").getDouble("longitude"));
+
+                apartmentList.add(apartment);
+//note we may have to move the setApartmentText stuff above outside the for loop
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+
+        }//end of for loop
 
 
-
+    } // end of parseApartment
 
 
 
