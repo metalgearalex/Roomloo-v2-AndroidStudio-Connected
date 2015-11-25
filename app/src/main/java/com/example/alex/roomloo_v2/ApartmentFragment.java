@@ -50,10 +50,11 @@ public class ApartmentFragment extends Fragment {
     private Button mScheduleButton;
     private AccessToken mAccessToken;
 
+    private LatLng mMarker_latlng;
     private static View view;
     private static GoogleMap mMap;
-    private static Double latitude;
-    private static Double longitude;
+    private static Double mLatitude;
+    private static Double mLongitude;
     private SupportMapFragment mSupportMapFragment;
 
     //to retrieve an extra (i.e. which apartment is this that we're showing?)
@@ -72,7 +73,6 @@ public class ApartmentFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        int apartmentId = (int) getArguments().getSerializable(ARG_APARTMENT_ID);
 
         new GetApartmentTask().execute();
         //former code that worked =>> new GetApartmentTask().execute();
@@ -157,7 +157,7 @@ public class ApartmentFragment extends Fragment {
         @Override
         protected Apartment doInBackground(ApiConnector... params) {
             int apartmentId = (int) getArguments().getSerializable(ARG_APARTMENT_ID); //this results in the correct apt id
-            return new ApiConnector().getApartment(apartmentId); //mApartment is null here?
+            return new ApiConnector().getApartment(apartmentId); //in debugger mApartment shows up as null here even when its working
                 }
 
         //reminder the ApiConnector class is really a giant JSONArray
@@ -173,9 +173,9 @@ public class ApartmentFragment extends Fragment {
             String apartmentText = mApartment.getApartmentText(); //NullPointerException here
             mApartmentTextView.setText(apartmentText );
 
-            //this is necessary to get your actual list to show up on the user's screen at least in ListingsFragment
-                //mListingsAdapter = new ListingsAdapter(apartmentList);
-                //mListingsRecyclerView.setAdapter(mListingsAdapter);
+            mLatitude = mApartment.getApartmentLatitude();
+            mLongitude = mApartment.getApartmentLongitude();
+
                 }
 
     } // end of GetApartmentTask method
@@ -210,16 +210,17 @@ public class ApartmentFragment extends Fragment {
 //i may need to add id as a parameter to getApartmentLatitude in the Apartment class and use apartmentId above
 //if not the idea is that all apartments get their latitude and longitude pulled from the API in ApartmentInventory.getApartmentList()
 //so you should just be able to pull the latitude and longitude placeholders in the Apartment class via the getApartmentLatitude() & Longitude methods
-                        LatLng marker_latlng = new LatLng(mApartment.getApartmentLatitude(), mApartment.getApartmentLongitude() ); //if you comment out mAparmentsetText mApartment here has a value
+
+                        mMarker_latlng = new LatLng(mLatitude, mLongitude ); //mLatitude and mLongitude have appropriate values
 
                         //target = the location the camera is pointing at
                         //trying to replace with just position >> CameraPosition cameraPosition = new CameraPosition.Builder().target(marker_latlng).zoom(15.0f).build();
 
                         // For dropping a marker and positioning the camera (i.e. map) at a point on the Map
                         //title is what shows up when you click on the marker
-                        googleMap.addMarker(new MarkerOptions().position(marker_latlng).title("Apartment").snippet("Address"));
+                        googleMap.addMarker(new MarkerOptions().position(mMarker_latlng).title("Apartment").snippet("Address"));
                         //to actually auto-zoom-in on that marker
-                        CameraUpdate yourLocation = CameraUpdateFactory.newLatLngZoom(marker_latlng, 17); //5 is the zoom level
+                        CameraUpdate yourLocation = CameraUpdateFactory.newLatLngZoom(mMarker_latlng, 17); //5 is the zoom level
                         googleMap.animateCamera(yourLocation);
 //commenting out some stackoverflow code because don't think we need it and seems to be messing things up
                         //
