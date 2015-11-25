@@ -39,10 +39,10 @@ public class Apartment {
         return mId;
     }
 
-
     public String getApartmentText() {
         return mApartmentText;
     }
+
 
     public void setApartmentText(String apartmentText) {
         mApartmentText = apartmentText;

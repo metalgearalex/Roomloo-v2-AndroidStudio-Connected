@@ -139,13 +139,13 @@ public Apartment getApartment(int idInt) {
         Log.i(TAG, "Received JSON: " + jsonString);
         JSONObject jsonObject = new JSONObject(jsonString); //this was formerly a JSONArray but got an error saying value of type JSONObject cannot be converted to JSONArray
         JSONArray jsonArray = jsonObject.getJSONArray("apartments"); //trying to convert my JSONObject into a JSONArray and then really only use this going forward to avoid double counting the arraylist items
-        parseApartmentList(apartmentList, jsonArray); //calling the parseApartmentList method defined below
+        parseApartment(apartmentList, jsonArray); //calling the parseApartmentList method defined below
     }
     catch (JSONException je) {
         Log.e(TAG, "Failed to parse JSON", je);
     }
     catch (IOException ioe) {
-        Log.e(TAG, "Failed to fetch apartments - IOException", ioe); //this is getting triggered, prob due to jsonobject vs. jsonarray issue
+        Log.e(TAG, "Failed to fetch apartments - IOException", ioe);
     }
 
     for (Apartment apartment : apartmentList) {

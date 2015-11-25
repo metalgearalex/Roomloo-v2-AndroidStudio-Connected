@@ -33,11 +33,6 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-
-import java.io.IOException;
-
 /**
  * Created by Alex on 9/18/2015.
  */
@@ -74,30 +69,16 @@ public class ApartmentFragment extends Fragment {
     }
 
 
-    //added this method to get a real JSonArray value for getApartment method within onCreate
-    private JSONArray getJsonArray() throws IOException, JSONException { //added the throws part
-        ApartmentInventory apartmentInventory = ApartmentInventory.get(getActivity());
-
-        //the JSONObject / JSONArray lines are really there to prevent a non-static method from a static context error in getApartmentList()
-        JSONArray placeholderJsonAray = new JSONArray(); //does this make sense? creating a placeholderJsonArray to then call getJSONArray on and get the Array at position 0 , i.e. the first one
-        JSONArray realJsonArrayValue = placeholderJsonAray.getJSONArray(0);
-
-        //something along these lines may be an alternative for the above
-        //we'd be constructing a JSONObject first because .getJSONArray requires an index instead of a string when you do JSONObject.getJSONArray
-        // JSONObject placeholderJsonObject = new JSONObject();
-        //JSONArray realJsonArrayValue = placeholderJsonObject.getJSONArray("apartments"); //this area is where we define JSONArray i.e. point to "apartments" in the API
-        return realJsonArrayValue;
-    }
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         int apartmentId = (int) getArguments().getSerializable(ARG_APARTMENT_ID);
 
+        new GetApartmentTask().execute();
+        //former code that worked =>> new GetApartmentTask().execute();
+
         //prior code that worked:
         // mApartment = ApartmentInventory.get(getActivity() ).getApartment(apartmentId);//former code that worked to pull up the view of one un-specific apartment --> mApartment = new Apartment();
-
-        new GetApartmentTask().execute();
 
         //FB related code here
 //originally was getContext() but that didn't work here. getActivity returns the activity associated with a fragment and the Activity is a context since Activity extends Context
@@ -176,7 +157,7 @@ public class ApartmentFragment extends Fragment {
         @Override
         protected Apartment doInBackground(ApiConnector... params) {
             int apartmentId = (int) getArguments().getSerializable(ARG_APARTMENT_ID); //this results in the correct apt id
-            return new ApiConnector().getApartment(apartmentId); //mApartment is null here. maybe its a problem with ApiConnector?
+            return new ApiConnector().getApartment(apartmentId); //mApartment is null here?
                 }
 
         //reminder the ApiConnector class is really a giant JSONArray
@@ -186,13 +167,18 @@ public class ApartmentFragment extends Fragment {
         //gets a real value in ListingsFragment when we call getApartmentList()
         @Override
         protected void onPostExecute(Apartment apartment) { //accepts as input the value you just returned inside doInBackground, in this case an Apartment
-            mApartment = apartment;
+            mApartment = apartment; //this is where you define mApartment is the apartment that comes from the API. This is then used throughout to get/set latitude, text, etc
+
+//setting apartmentText here to try and get rid of nullpointererrors when getApartmentText is called
+            String apartmentText = mApartment.getApartmentText(); //NullPointerException here
+            mApartmentTextView.setText(apartmentText );
+
             //this is necessary to get your actual list to show up on the user's screen at least in ListingsFragment
-            //mListingsAdapter = new ListingsAdapter(apartmentList);
-            //mListingsRecyclerView.setAdapter(mListingsAdapter);
+                //mListingsAdapter = new ListingsAdapter(apartmentList);
+                //mListingsRecyclerView.setAdapter(mListingsAdapter);
                 }
 
-    } // end of GetAllCustomerTask method
+    } // end of GetApartmentTask method
 
 
     //to explicitly inflate the fragment's view. basically just calling LayoutInflater.inflate(....) and passing in the layout resource ID
@@ -224,7 +210,7 @@ public class ApartmentFragment extends Fragment {
 //i may need to add id as a parameter to getApartmentLatitude in the Apartment class and use apartmentId above
 //if not the idea is that all apartments get their latitude and longitude pulled from the API in ApartmentInventory.getApartmentList()
 //so you should just be able to pull the latitude and longitude placeholders in the Apartment class via the getApartmentLatitude() & Longitude methods
-                        LatLng marker_latlng = new LatLng(mApartment.getApartmentLatitude(), mApartment.getApartmentLongitude() );
+                        LatLng marker_latlng = new LatLng(mApartment.getApartmentLatitude(), mApartment.getApartmentLongitude() ); //if you comment out mAparmentsetText mApartment here has a value
 
                         //target = the location the camera is pointing at
                         //trying to replace with just position >> CameraPosition cameraPosition = new CameraPosition.Builder().target(marker_latlng).zoom(15.0f).build();
@@ -259,10 +245,19 @@ public class ApartmentFragment extends Fragment {
         //end of Google Maps Code in onCreateView at least
 
         mApartmentTextView = (TextView) v.findViewById(R.id.details_page_apartment_text);
-        //temporarily commenting out
-            mApartmentTextView.setText(mApartment.getApartmentText() ); //yes this works and is necessary to show the apartment text on the specific-apartment-view's page. Oddly enough, sometimes Android gets a nullpointerexception with this line, if you get it just temporarily comment out this line so you  can see what the real error is
+        //this caused a network on main thread exception
+            //ApiConnector apiConnector = new ApiConnector();
+            //int apartmentId = (int) getArguments().getSerializable(ARG_APARTMENT_ID);
+            //mApartmentTextView.setText(apiConnector.getApartment(apartmentId).getApartmentText() );
 
-        //trying to get a compressed image to show up
+//COMMENTING OUT FOR NOW, mApartment here is null
+        //String apartmentText = mApartment.getApartmentText(); //NullPointerException here
+        //mApartmentTextView.setText(apartmentText ); //yes this works and is necessary to show the apartment text on the specific-apartment-view's page. Oddly enough, sometimes Android gets a nullpointerexception with this line, if you get it just temporarily comment out this line so you  can see what the real error is
+        //NOTE mApartment gets a value in onpostexecute
+
+        //old way >> mApartmentTextView.setText(mApartment.getApartmentText() );
+
+       //trying to get a compressed image to show up
         mApartmentImageView = (ImageView) v.findViewById(R.id.details_page_apartment_picture);
         mApartmentImageView.setImageBitmap(PictureCompression.decodeSampledBitmapFromResource(getResources(), R.drawable.livingroom, 100, 100));
 

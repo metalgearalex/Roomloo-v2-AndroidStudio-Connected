@@ -69,7 +69,7 @@ public class ListingsFragment extends Fragment {
         //gets a real value in ListingsFragment when we call getApartmentList()
         @Override
         protected void onPostExecute(List<Apartment> apartmentList) { //accepts as input the JSONArray you just returned inside doInBackground, in this case a JSONArray
-            mApartmentList = apartmentList;
+            mApartmentList = apartmentList; //debugger shows mApartmentList as null here too even though everything's working on that page
             //this is necessary to get your actual list to show up on the user's screen
             mListingsAdapter = new ListingsAdapter(apartmentList);
             mListingsRecyclerView.setAdapter(mListingsAdapter);
