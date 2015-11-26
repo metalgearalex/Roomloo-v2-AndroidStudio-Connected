@@ -110,7 +110,7 @@ public class ApiConnector {
                 Integer idInt = apartmentJsonObject.getInt("id");
                 Apartment apartment = new Apartment(idInt); //UUID from String already converts our JSON string result into a UUID
 
-                apartment.setApartmentText(apartmentJsonObject.getInt("price") + " " + apartmentJsonObject.getInt("bedrooms") + " " + apartmentJsonObject.getInt("bathrooms") );
+                apartment.setApartmentText("Price: " + apartmentJsonObject.getInt("price") + " " + "Bedrooms: " + apartmentJsonObject.getInt("bedrooms") + " " + "Bathrooms: " + apartmentJsonObject.getInt("bathrooms") );
                 apartment.setApartmentLatitude(apartmentJsonObject.getJSONObject("building").getDouble("latitude"));
                 apartment.setApartmentLongitude(apartmentJsonObject.getJSONObject("building").getDouble("longitude"));
 

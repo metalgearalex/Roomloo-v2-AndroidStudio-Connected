@@ -169,7 +169,7 @@ public class ApartmentFragment extends Fragment {
             mApartment = apartment; //this is where you define mApartment is the apartment that comes from the API. This is then used throughout to get/set latitude, text, etc
 
 //setting apartmentText here to try and get rid of nullpointererrors when getApartmentText is called
-            String apartmentText = mApartment.getApartmentText(); //NullPointerException here
+            String apartmentText = mApartment.getApartmentText();
             mApartmentTextView.setText(apartmentText );
 
             mLatitude = mApartment.getApartmentLatitude();
