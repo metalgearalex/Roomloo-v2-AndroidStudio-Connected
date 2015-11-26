@@ -62,11 +62,14 @@ public class ListingsFragment extends Fragment {
             return new ApiConnector().getApartmentList();
                 }
 
-        //reminder the ApiConnector class is really a giant JSONArray
-        //also the api returns the result in a variable called jsonArray
-        //and we get that in a JSONArray through the doInBackground method override within GetAllCustomerTask
-        //HOWEVER, SEEMS THE JSONArray/jsonArray in this whole tab is really just a placeholder the whole time and it
-        //gets a real value in ListingsFragment when we call getApartmentList()
+        //think this is all old and no longer true
+            // reminder the ApiConnector class is really a giant JSONArray
+            //also the api returns the result in a variable called jsonArray
+            //and we get that in a JSONArray through the doInBackground method override within GetAllCustomerTask
+            //HOWEVER, SEEMS THE JSONArray/jsonArray in this whole tab is really just a placeholder the whole time and it
+            //gets a real value in ListingsFragment when we call getApartmentList()
+
+        //for some reason seems you have to set all the properties of apartmentList / apartment that you want to set or access in this class here in onPostExecute
         @Override
         protected void onPostExecute(List<Apartment> apartmentList) { //accepts as input the JSONArray you just returned inside doInBackground, in this case a JSONArray
             mApartmentList = apartmentList; //debugger shows mApartmentList as null here too even though everything's working on that page

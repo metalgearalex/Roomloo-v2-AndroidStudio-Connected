@@ -37,7 +37,7 @@ import com.google.android.gms.maps.model.MarkerOptions;
  * Created by Alex on 9/18/2015.
  */
 public class ApartmentFragment extends Fragment {
-    //going somewhat rouge here and not following a specific part of the book. if things don't work it's because of the below
+
     private Apartment mApartment;
     private static final String ARG_APARTMENT_ID = "apartment_id";
     private ImageView mApartmentImageView;
@@ -159,16 +159,20 @@ public class ApartmentFragment extends Fragment {
             return new ApiConnector().getApartment(apartmentId); //in debugger mApartment shows up as null here even when its working
                 }
 
-        //reminder the ApiConnector class is really a giant JSONArray
-        //also the api returns the result in a variable called jsonArray
-        //and we get that in a JSONArray through the doInBackground method override within GetAllCustomerTask
-        //HOWEVER, SEEMS THE JSONArray/jsonArray in this whole tab is really just a placeholder the whole time and it
-        //gets a real value in ListingsFragment when we call getApartmentList()
+        //Think this is all old and no longer true anymore:
+            //reminder the ApiConnector class is really a giant JSONArray
+            //also the api returns the result in a variable called jsonArray
+            //and we get that in a JSONArray through the doInBackground method override within GetAllCustomerTask
+            //HOWEVER, SEEMS THE JSONArray/jsonArray in this whole tab is really just a placeholder the whole time and it
+            //gets a real value in ListingsFragment when we call getApartmentList()
+
+        //for some reason we have to set all apartment attributes (text, latitude,longitude) etc here in onPostExecute
+            //even though mApartment is accessible throughout the class
         @Override
         protected void onPostExecute(Apartment apartment) { //accepts as input the value you just returned inside doInBackground, in this case an Apartment
             mApartment = apartment; //this is where you define mApartment is the apartment that comes from the API. This is then used throughout to get/set latitude, text, etc
 
-//setting apartmentText here to try and get rid of nullpointererrors when getApartmentText is called
+//setting apartmentText here to get rid of nullpointererrors if getApartmentText is called in other methods
             String apartmentText = mApartment.getApartmentText();
             mApartmentTextView.setText(apartmentText );
 
@@ -245,17 +249,14 @@ public class ApartmentFragment extends Fragment {
         //end of Google Maps Code in onCreateView at least
 
         mApartmentTextView = (TextView) v.findViewById(R.id.details_page_apartment_text);
-        //this caused a network on main thread exception
-            //ApiConnector apiConnector = new ApiConnector();
-            //int apartmentId = (int) getArguments().getSerializable(ARG_APARTMENT_ID);
-            //mApartmentTextView.setText(apiConnector.getApartment(apartmentId).getApartmentText() );
 
-//COMMENTING OUT FOR NOW, mApartment here is null
+
+//COMMENTING OUT the below few lines because it causes a nullpointerexception. for some reason need to setText etc in onPostExecute
         //String apartmentText = mApartment.getApartmentText(); //NullPointerException here
-        //mApartmentTextView.setText(apartmentText ); //yes this works and is necessary to show the apartment text on the specific-apartment-view's page. Oddly enough, sometimes Android gets a nullpointerexception with this line, if you get it just temporarily comment out this line so you  can see what the real error is
+        //mApartmentTextView.setText(apartmentText );
         //NOTE mApartment gets a value in onpostexecute
 
-        //old way >> mApartmentTextView.setText(mApartment.getApartmentText() );
+        //old way before API integration >> mApartmentTextView.setText(mApartment.getApartmentText() );
 
        //trying to get a compressed image to show up
         mApartmentImageView = (ImageView) v.findViewById(R.id.details_page_apartment_picture);
