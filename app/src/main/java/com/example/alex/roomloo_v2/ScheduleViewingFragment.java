@@ -2,6 +2,7 @@ package com.example.alex.roomloo_v2;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -55,8 +56,10 @@ public class ScheduleViewingFragment extends Fragment {
 
         //previous code
             // mApartment = ApartmentInventory.get(getActivity() ).getApartment(apartmentId);
-        ApiConnector apiConnector = new ApiConnector();
-        mApartment = apiConnector.getApartment(apartmentId);
+        new GetApartmentTask().execute();
+        //because this results in a newtork on mainthread error:
+            // ApiConnector apiConnector = new ApiConnector();
+            //mApartment = apiConnector.getApartment(apartmentId);
 
 
         //FB related code here
@@ -70,6 +73,37 @@ public class ScheduleViewingFragment extends Fragment {
         mCallbackManager_Schedule = CallbackManager.Factory.create();
 
             } //end of onCreate
+
+
+    //to avoid a networkonmainthreaderror
+    private class GetApartmentTask extends AsyncTask<ApiConnector,Long,Apartment > //JSONArray here specifies the type of result you'll be sending back to the main thread
+    {
+        //the ... is a way to tell Android you have a variable number of parameters
+        //params seems to be a common way to pass in a variable type or something along the lines
+        //but note that params is still just a variable name. you can call it anything
+        //U can then pass multiple items and just access like params[0].. etc..
+        @Override
+        protected Apartment doInBackground(ApiConnector... params) {
+            int apartmentId = (int) getArguments().getSerializable(ARG_APARTMENT_ID_SCHEDULER); //this results in the correct apt id
+            return new ApiConnector().getApartment(apartmentId); //in debugger mApartment shows up as null here even when its working
+        }
+
+        //reminder the ApiConnector class is really a giant JSONArray
+        //also the api returns the result in a variable called jsonArray
+        //and we get that in a JSONArray through the doInBackground method override within GetAllCustomerTask
+        //HOWEVER, SEEMS THE JSONArray/jsonArray in this whole tab is really just a placeholder the whole time and it
+        //gets a real value in ListingsFragment when we call getApartmentList()
+        @Override
+        protected void onPostExecute(Apartment apartment) { //accepts as input the value you just returned inside doInBackground, in this case an Apartment
+            mApartment = apartment; //this is where you define mApartment is the apartment that comes from the API. This is then used throughout to get/set latitude, text, etc
+
+//may have to eventually put in getapartmentdate type method calls here. see what you did in ApartmentFragment
+
+        }
+
+    } // end of GetApartmentTask method
+
+
 
     @Override
     public View onCreateView (LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {

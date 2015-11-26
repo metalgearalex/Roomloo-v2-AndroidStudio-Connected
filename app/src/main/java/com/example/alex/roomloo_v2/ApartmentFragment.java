@@ -75,7 +75,6 @@ public class ApartmentFragment extends Fragment {
         super.onCreate(savedInstanceState);
 
         new GetApartmentTask().execute();
-        //former code that worked =>> new GetApartmentTask().execute();
 
         //prior code that worked:
         // mApartment = ApartmentInventory.get(getActivity() ).getApartment(apartmentId);//former code that worked to pull up the view of one un-specific apartment --> mApartment = new Apartment();
@@ -211,7 +210,7 @@ public class ApartmentFragment extends Fragment {
 //if not the idea is that all apartments get their latitude and longitude pulled from the API in ApartmentInventory.getApartmentList()
 //so you should just be able to pull the latitude and longitude placeholders in the Apartment class via the getApartmentLatitude() & Longitude methods
 
-                        mMarker_latlng = new LatLng(mLatitude, mLongitude ); //mLatitude and mLongitude have appropriate values
+                        mMarker_latlng = new LatLng(mLatitude, mLongitude );
 
                         //target = the location the camera is pointing at
                         //trying to replace with just position >> CameraPosition cameraPosition = new CameraPosition.Builder().target(marker_latlng).zoom(15.0f).build();
