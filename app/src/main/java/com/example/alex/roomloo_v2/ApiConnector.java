@@ -100,7 +100,11 @@ public class ApiConnector {
                 Integer idInt = apartmentJsonObject.getInt("id");
                 Apartment apartment = new Apartment(idInt);
 
-                apartment.setApartmentText("Price: $" + apartmentJsonObject.getInt("price") + " " + "Bedrooms: " + apartmentJsonObject.getInt("bedrooms") + " " + "Bathrooms: " + apartmentJsonObject.getInt("bathrooms") );
+               //done to format the price of the apartments to have a comma separator
+                int apartmentPrice = apartmentJsonObject.getInt("price");
+                String apartmentPriceText = String.format("%,d", apartmentPrice);
+
+                apartment.setApartmentText("Price: $" + apartmentPriceText + " " + "Bedrooms: " + apartmentJsonObject.getInt("bedrooms") + " " + "Bathrooms: " + apartmentJsonObject.getInt("bathrooms") );
                 apartment.setApartmentLatitude(apartmentJsonObject.getJSONObject("building").getDouble("latitude"));
                 apartment.setApartmentLongitude(apartmentJsonObject.getJSONObject("building").getDouble("longitude"));
 
