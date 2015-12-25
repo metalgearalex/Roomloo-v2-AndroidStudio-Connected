@@ -72,7 +72,7 @@ public class ApiConnector {
             JSONObject jsonObject = new JSONObject(jsonString); //this was formerly a JSONArray but got an error saying value of type JSONObject cannot be converted to JSONArray
             JSONArray jsonArray = jsonObject.getJSONArray("apartments"); //trying to convert my JSONObject into a JSONArray and then really only use this going forward to avoid double counting the arraylist items
             parseApartmentList(apartmentList, jsonArray); //calling the parseApartmentList method defined below
-        }
+                    }
         catch (JSONException je) {
             Log.e(TAG, "Failed to parse JSON", je);
         }
@@ -100,7 +100,7 @@ public class ApiConnector {
                 Integer idInt = apartmentJsonObject.getInt("id");
                 Apartment apartment = new Apartment(idInt);
 
-                apartment.setApartmentText("Price: " + apartmentJsonObject.getInt("price") + " " + "Bedrooms: " + apartmentJsonObject.getInt("bedrooms") + " " + "Bathrooms: " + apartmentJsonObject.getInt("bathrooms") );
+                apartment.setApartmentText("Price: $" + apartmentJsonObject.getInt("price") + " " + "Bedrooms: " + apartmentJsonObject.getInt("bedrooms") + " " + "Bathrooms: " + apartmentJsonObject.getInt("bathrooms") );
                 apartment.setApartmentLatitude(apartmentJsonObject.getJSONObject("building").getDouble("latitude"));
                 apartment.setApartmentLongitude(apartmentJsonObject.getJSONObject("building").getDouble("longitude"));
 
