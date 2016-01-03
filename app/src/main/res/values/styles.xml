@@ -2,8 +2,12 @@
 
     <!-- Base application theme. -->
     <!-- Note this is at the entire app level not just the toolbar -->
-    <style name="AppTheme" parent="Theme.AppCompat.Light.NoActionBar">
+    <!-- USED TO BE:    <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar"> -->
+    <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
         <!-- Customize your theme here. -->
+        <item name="colorPrimary">@color/primaryColor</item>
     </style>
+
+
 
 </resources>

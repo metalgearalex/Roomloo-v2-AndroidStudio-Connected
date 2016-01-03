@@ -39,13 +39,20 @@ public class ListingsFragment extends Fragment {
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
         inflater.inflate(R.menu.toolbar_menu, menu);
+
+//commenting out for a second
+        //trying out getting toolbar from fragment instead of activity
+//        ListingsActivity listingsActivity = new ListingsActivity(); //this is to prevent non-static error on next line (toolbar line)
+//        Toolbar myToolbar = (Toolbar) listingsActivity.findViewById(R.id.my_toolbar);
+//        ((AppCompatActivity) getActivity()).setSupportActionBar(myToolbar);
+        //^trying out getting toolbar from fragment instead of activity
+//        line to cause app to crash and allow me to debug
             }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
-
 
         new GetAllCustomerTask().execute();
 
@@ -188,6 +195,7 @@ public class ListingsFragment extends Fragment {
         public ListingsHolder onCreateViewHolder (ViewGroup parent, int viewType) {
             LayoutInflater layoutInflater = LayoutInflater.from(getActivity() );
             View view = layoutInflater.inflate(R.layout.fragment_listings_layout, parent, false);
+
             return new ListingsHolder(view);
                 }
 
