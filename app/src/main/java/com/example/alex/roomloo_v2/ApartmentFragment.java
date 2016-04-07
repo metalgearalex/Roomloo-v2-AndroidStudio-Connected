@@ -4,6 +4,7 @@ package com.example.alex.roomloo_v2;
 
 
 import android.content.Intent;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -32,6 +33,7 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.squareup.picasso.Picasso;
 
 /**
  * Created by Alex on 9/18/2015.
@@ -56,6 +58,9 @@ public class ApartmentFragment extends Fragment {
     private static Double mLatitude;
     private static Double mLongitude;
     private SupportMapFragment mSupportMapFragment;
+    private CheckPicassoErrors mCheckPicassoErrors;
+    private Picasso mPicasso;
+    private Exception mException;
 
     //to retrieve an extra (i.e. which apartment is this that we're showing?)
     //basically stashing the data(apartment's id) in its arguments bundle
@@ -126,7 +131,6 @@ public class ApartmentFragment extends Fragment {
     private void updateToken (AccessToken currentAccessToken) {
         //trying to account for edge case where log-in status changes while they're still on the apartment page
         //edge solved when you log-in but still lets you log-out then schedule a viewing if you don't leave the page
-
         if (isLoggedIn() ) {
             mScheduleButton.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -260,7 +264,14 @@ public class ApartmentFragment extends Fragment {
 
        //trying to get a compressed image to show up
         mApartmentImageView = (ImageView) v.findViewById(R.id.details_page_apartment_picture);
-        mApartmentImageView.setImageBitmap(PictureCompression.decodeSampledBitmapFromResource(getResources(), R.drawable.livingroom, 100, 100));
+        Picasso.with(getActivity()).load("//roomloo-development.s3.amazonaws.com/uploads/e6a0dff8-ef69-408c-a798-f2cb4565b2e0/enchanted_trail_7.jpg").into(mApartmentImageView);
+        //Picasso.with(getActivity()).load("//roomloo-development.s3.amazonaws.com/uploads/e6a0dff8-ef69-408c-a798-f2cb4565b2e0/enchanted_trail_7.jpg").resize(100,100).centerCrop().into(mApartmentImageView);
+
+        Uri path = Uri.parse("//roomloo-development.s3.amazonaws.com/uploads/e6a0dff8-ef69-408c-a798-f2cb4565b2e0/enchanted_trail_7.jpg");
+        mCheckPicassoErrors.onImageLoadFailed(mPicasso,path, mException);
+
+        //old way I got the image to load before trying Picasso
+            //mApartmentImageView.setImageBitmap(PictureCompression.decodeSampledBitmapFromResource(getResources(), R.drawable.livingroom, 100, 100));
 
         //Getting a schedule Button to show up and hooked-up
         mScheduleButton = (Button) v.findViewById(R.id.schedule_button);
@@ -310,6 +321,15 @@ public class ApartmentFragment extends Fragment {
 
         return v;
     } //end of onCreateView
+
+
+    //to try and see error messages associated with picasso
+    public class CheckPicassoErrors implements Picasso.Listener {
+        @Override
+        public void onImageLoadFailed(Picasso picasso, Uri uri, Exception exception) {
+            // Display the exception
+        }
+    }
 
 
     /***** Sets up the map if it is possible to do so *****/

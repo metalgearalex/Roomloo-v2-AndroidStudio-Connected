@@ -35,4 +35,7 @@ dependencies {
     compile 'com.google.android.gms:play-services-maps:7.8.0'
     compile files('libs/ksoap2-android-assembly-2.5.8-jar-with-dependencies.jar')
     compile 'org.jbundle.util.osgi.wrapped:org.jbundle.util.osgi.wrapped.org.apache.http.client:4.1.2' //to try to get deprecated HTTPRequest stuff to work
+
+    //for picasso library (makes it easier to get images from the web into android apps)
+    compile group:'com.squareup.picasso', name:'picasso', version:'2.5.2'
 }
