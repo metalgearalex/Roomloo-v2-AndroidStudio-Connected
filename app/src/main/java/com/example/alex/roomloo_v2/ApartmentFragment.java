@@ -4,11 +4,9 @@ package com.example.alex.roomloo_v2;
 
 
 import android.content.Intent;
-import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -267,31 +265,27 @@ public class ApartmentFragment extends Fragment {
        //trying to get image from AWS to show up using Picasso
         mApartmentImageView = (ImageView) v.findViewById(R.id.details_page_apartment_picture);
         String path = "http://roomloo-development.s3.amazonaws.com/uploads/e6a0dff8-ef69-408c-a798-f2cb4565b2e0/enchanted_trail_8.jpg";
+        //temporarily adding
+        Picasso.with(getActivity()).load(path).into(mApartmentImageView);
 
-        Picasso picasso = new Picasso.Builder(getContext())
-                .listener(new Picasso.Listener() {
-                    @Override
-                    public void onImageLoadFailed(Picasso picasso, Uri uri, Exception exception) {
-                        //Here your log
-                            Log.e(TAG, "Failed to load image");
-                    }//end of onImageLoad
-                })
-                .build(); picasso.load(path).into(mApartmentImageView);
-//version 1: .build(); picasso.load(new File(path)).into(mApartmentImageView);
-//version 2: .build();picasso.load(path).into(mApartmentImageView)
-//switched between the 2 and neither worked
+        //another option with sizing etc: Picasso.with(getActivity()).load(path).resize(100,100).centerCrop().into(mApartmentImageView);
 
+//the below also works and allows you to log whether it failed to load the image at all
+//        Picasso picasso = new Picasso.Builder(getContext())
+//                .listener(new Picasso.Listener() {
+//                    @Override
+//                    public void onImageLoadFailed(Picasso picasso, Uri uri, Exception exception) {
+//                        //Here your log
+//                            Log.e(TAG, "Failed to load image");
+//                    }//end of onImageLoad
+//                })
+//                .build(); picasso.load(path).into(mApartmentImageView);
 
-        // Picasso.with(getActivity()).load(new File(path)).into(mApartmentImageView);  //http://square.github.io/picasso/static/debug.png
-        //another option with sizing etc: Picasso.with(getActivity()).load("//roomloo-development.s3.amazonaws.com/uploads/e6a0dff8-ef69-408c-a798-f2cb4565b2e0/enchanted_trail_7.jpg").resize(100,100).centerCrop().into(mApartmentImageView);
-
-        //commenting out error checker because it caused a nullpointer exception. interestingly this didnt happen when i put the url as the AWS one vs. the one in the tutorial
-        // Uri path = Uri.parse("http://square.github.io/picasso/static/debug.png");
-        //mCheckPicassoErrors.onImageLoadFailed(mPicasso,path, mException);
 
         //old way I got the image to load before trying Picasso
         //trying to get a compressed image to show up
-            //mApartmentImageView.setImageBitmap(PictureCompression.decodeSampledBitmapFromResource(getResources(), R.drawable.livingroom, 100, 100));
+        //mApartmentImageView.setImageBitmap(PictureCompression.decodeSampledBitmapFromResource(getResources(), R.drawable.livingroom, 100, 100));
+
 
         //Getting a schedule Button to show up and hooked-up
         mScheduleButton = (Button) v.findViewById(R.id.schedule_button);
