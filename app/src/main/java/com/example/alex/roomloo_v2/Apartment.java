@@ -13,6 +13,7 @@ public class Apartment {
     private Date mDate;
     private double mlatitude; //added for database -> Google Map
     private double mlongitude; //added for database -> Google Map
+    private String mImageURL; //added to pull images from our AWS database
     //perhaps we need a photoTitle to get the right picture?
     // in CriminalIntent we did:
         // public String getPhotoFilename() {
@@ -73,6 +74,15 @@ public class Apartment {
         mlongitude = longitude;
             }
 
+
+    public String getApartmentImageURL() {
+        return mImageURL;
+    }
+
+
+    public void setApartmentImageURL(String imageURL) {
+        mImageURL = imageURL;
+    }
 
 }
 

@@ -77,7 +77,7 @@ public class ApiConnector {
             Log.e(TAG, "Failed to parse JSON", je);
         }
         catch (IOException ioe) {
-            Log.e(TAG, "Failed to fetch apartments - IOException", ioe); //this is getting triggered, prob due to jsonobject vs. jsonarray issue
+            Log.e(TAG, "Failed to fetch apartments - IOException", ioe);
         }
         return apartmentList;
     }
@@ -101,12 +101,41 @@ public class ApiConnector {
                 Apartment apartment = new Apartment(idInt);
 
                //done to format the price of the apartments to have a comma separator
-                int apartmentPrice = apartmentJsonObject.getInt("price");
+                int apartmentPrice = apartmentJsonObject.getInt("price"); //getInt is a public JSONObject method that returns the value mapped by the name
                 String apartmentPriceText = String.format("%,d", apartmentPrice);
 
-                apartment.setApartmentText("Price: $" + apartmentPriceText + " " + "Bedrooms: " + apartmentJsonObject.getInt("bedrooms") + " " + "Bathrooms: " + apartmentJsonObject.getInt("bathrooms") );
+                apartment.setApartmentText("Price: $" + apartmentPriceText + " " + "Bedrooms: " + apartmentJsonObject.getInt("bedrooms") + " " + "Bathrooms: " + apartmentJsonObject.getInt("bathrooms"));
                 apartment.setApartmentLatitude(apartmentJsonObject.getJSONObject("building").getDouble("latitude"));
                 apartment.setApartmentLongitude(apartmentJsonObject.getJSONObject("building").getDouble("longitude"));
+
+                //trying to get apartment images from database
+                //problem is apartment_images is an array and JSONArray only lets you do getJSONObject(int index) instead of a string name i.e. "image"
+
+    //another attempt
+//                String apartmentImageURL = apartmentJsonObject.getJSONObject("image").toString();
+//                apartment.setApartmentImageURL(apartmentImageURL);
+
+//a second for loop (shown below) kind of worked. made the app stop crashing and otherwise work but doesn't seem to successfully pull in the image URL. think it's giving me a JSONException
+                JSONArray apartmentImageArray = apartmentJsonObject.getJSONArray("apartment_images");
+                for (int j=0; j<=apartmentImageArray.length(); j++) {
+                    try {
+                            JSONObject apartmentImageJsonObject = (JSONObject) apartmentImageArray.get(j);
+                        String apartmentImageURL = apartmentImageJsonObject.getString("image"); //getString returns the value mapped by the name
+                        apartment.setApartmentImageURL(apartmentImageURL);
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                }//end of for loop
+
+                //apartmentJsonObject.getJSONArray("apartment_images").getJStoString();
+
+                    //JSONObject apartmentImageArray2 = apartmentJsonObject.getJSONObject("apartment_images");
+//                String apartmentImageURL = apartmentJsonObject.getJSONObject("apartment_images").getJSONObject("image").toString();
+//                apartment.setApartmentImageURL(apartmentImageURL);
+
+                //previous work
+//                String apartmentImageURL = apartmentJsonObject.getJSONArray("apartment_images").toString();
+//                apartment.setApartmentImageURL(apartmentImageURL);
 
                 apartmentList.add(apartment);
 
@@ -176,6 +205,22 @@ public Apartment getApartment(int idInt) {
                 apartment.setApartmentText("Price: $" + apartmentPriceText + " " + "Bedrooms: " + apartmentJsonObject.getInt("bedrooms") + " " + "Bathrooms: " + apartmentJsonObject.getInt("bathrooms") );
                 apartment.setApartmentLatitude(apartmentJsonObject.getJSONObject("building").getDouble("latitude"));
                 apartment.setApartmentLongitude(apartmentJsonObject.getJSONObject("building").getDouble("longitude"));
+
+
+                //trying to get apartment images from database
+                //problem is apartment_images is an array and JSONArray only lets you do getJSONObject(int index) instead of a string name i.e. "image"
+
+                JSONArray apartmentImageArray = apartmentJsonObject.getJSONArray("apartment_images");
+                for (int j=0; j<=apartmentImageArray.length(); j++) {
+                    try {
+                        JSONObject apartmentImageJsonObject = (JSONObject) apartmentImageArray.get(j);
+                        String apartmentImageURL = apartmentImageJsonObject.getString("image");
+                        apartment.setApartmentImageURL(apartmentImageURL);
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                }//end of for loop
+
 
                 apartmentList.add(apartment);
 

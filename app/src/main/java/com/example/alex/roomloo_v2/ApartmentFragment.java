@@ -43,6 +43,7 @@ public class ApartmentFragment extends Fragment {
     private static final String ARG_APARTMENT_ID = "apartment_id";
     private ImageView mApartmentImageView;
     private TextView mApartmentTextView;
+    private static String mImageURL;
 
     private LoginButton mFbLoginButton;
     private CallbackManager mCallbackManager;
@@ -57,9 +58,7 @@ public class ApartmentFragment extends Fragment {
     private static Double mLatitude;
     private static Double mLongitude;
     private SupportMapFragment mSupportMapFragment;
-//    private CheckPicassoErrors mCheckPicassoErrors;
-    private Picasso mPicasso;
-    private Exception mException;
+
     private static final String TAG = "Picasso";
 
     //to retrieve an extra (i.e. which apartment is this that we're showing?)
@@ -183,6 +182,9 @@ public class ApartmentFragment extends Fragment {
             mLatitude = mApartment.getApartmentLatitude();
             mLongitude = mApartment.getApartmentLongitude();
 
+            //to get image URL from database to then use with Picasso to download the image
+            mImageURL = mApartment.getApartmentImageURL();
+
                 }
 
     } // end of GetApartmentTask method
@@ -264,9 +266,10 @@ public class ApartmentFragment extends Fragment {
 
        //trying to get image from AWS to show up using Picasso
         mApartmentImageView = (ImageView) v.findViewById(R.id.details_page_apartment_picture);
-        String path = "http://roomloo-development.s3.amazonaws.com/uploads/e6a0dff8-ef69-408c-a798-f2cb4565b2e0/enchanted_trail_8.jpg";
-        //temporarily adding
-        Picasso.with(getActivity()).load(path).into(mApartmentImageView);
+        Picasso.with(getActivity()).load(mImageURL).into(mApartmentImageView);
+        //former Picasso code that worked to get a fixed URL from database to load
+//        String path = "http://roomloo-development.s3.amazonaws.com/uploads/e6a0dff8-ef69-408c-a798-f2cb4565b2e0/enchanted_trail_8.jpg";
+//        Picasso.with(getActivity()).load(path).into(mApartmentImageView);
 
         //another option with sizing etc: Picasso.with(getActivity()).load(path).resize(100,100).centerCrop().into(mApartmentImageView);
 
@@ -282,7 +285,7 @@ public class ApartmentFragment extends Fragment {
 //                .build(); picasso.load(path).into(mApartmentImageView);
 
 
-        //old way I got the image to load before trying Picasso
+//old way I got the image to load before trying Picasso
         //trying to get a compressed image to show up
         //mApartmentImageView.setImageBitmap(PictureCompression.decodeSampledBitmapFromResource(getResources(), R.drawable.livingroom, 100, 100));
 
@@ -329,7 +332,7 @@ public class ApartmentFragment extends Fragment {
 
             @Override
             public void onError(FacebookException exception) {
-                Toast.makeText(getActivity(),"Sorry, something seems to have gone wrong with your log-in attempt", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getActivity(), "Sorry, something seems to have gone wrong with your log-in attempt", Toast.LENGTH_SHORT).show();
             }
         });//end of register callback method
 
