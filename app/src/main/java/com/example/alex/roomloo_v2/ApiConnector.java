@@ -211,11 +211,12 @@ public Apartment getApartment(int idInt) {
                 //problem is apartment_images is an array and JSONArray only lets you do getJSONObject(int index) instead of a string name i.e. "image"
 
                 JSONArray apartmentImageArray = apartmentJsonObject.getJSONArray("apartment_images");
-                for (int j=0; j<=apartmentImageArray.length(); j++) {
+                for (int j=0; j<apartmentImageArray.length(); j++) {
                     try {
-                        JSONObject apartmentImageJsonObject = (JSONObject) apartmentImageArray.get(j);
+                        JSONObject apartmentImageJsonObject = apartmentImageArray.getJSONObject(j);
                         String apartmentImageURL = apartmentImageJsonObject.getString("image");
                         apartment.setApartmentImageURL(apartmentImageURL);
+                        String debugerCheckerFiller = "3";
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
