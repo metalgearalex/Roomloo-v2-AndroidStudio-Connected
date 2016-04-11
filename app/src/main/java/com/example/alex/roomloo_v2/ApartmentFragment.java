@@ -1,4 +1,6 @@
 //the Fragment for your ApartmentActivity file, i.e. a specific Apartment Page
+//IMPORTANT: YOU HAVE TO DO ALL YOUR SETTEXT,SETIMAGE,ETC IN onPostExecute override within the GetApartmentTask method!
+
 
 package com.example.alex.roomloo_v2;
 
@@ -43,7 +45,7 @@ public class ApartmentFragment extends Fragment {
     private static final String ARG_APARTMENT_ID = "apartment_id";
     private ImageView mApartmentImageView;
     private TextView mApartmentTextView;
-    private static String mImageURL;
+    private String mImageURL;
 
     private LoginButton mFbLoginButton;
     private CallbackManager mCallbackManager;
@@ -183,8 +185,13 @@ public class ApartmentFragment extends Fragment {
             mLongitude = mApartment.getApartmentLongitude();
 
             //to get image URL from database to then use with Picasso to download the image
-            mImageURL = mApartment.getApartmentImageURL();
-
+            mImageURL = mApartment.getApartmentImageURL(); //does indeed have a value, which is the URL of the image from AWS
+             mApartment.setApartmentImageURL(mImageURL); //should be unnecessary and redudnant just doublechecking
+            Picasso.with(getActivity()).load(mImageURL).into(mApartmentImageView);
+            String errorChecker = "3";
+             //change back to this>   Picasso.with(getActivity()).load(mImageURL).into(mApartmentImageView);
+                //replacing the above with just the URL directly: "http://roomloo-development.s3.amazonaws.com/uploads/e6a0dff8-ef69-408c-a798-f2cb4565b2e0/enchanted_trail_8.jpg" makes it work
+            //doesn't seem to work with pic 7 tho? even tho with my browser it downloads it?
                 }
 
     } // end of GetApartmentTask method
@@ -266,7 +273,14 @@ public class ApartmentFragment extends Fragment {
 
        //trying to get image from AWS to show up using Picasso
         mApartmentImageView = (ImageView) v.findViewById(R.id.details_page_apartment_picture);
-        Picasso.with(getActivity()).load(mImageURL).into(mApartmentImageView);
+        //Picasso.with(getActivity()).load(mImageURL).into(mApartmentImageView);
+        //Picasso.with(getActivity()).load("//roomloo-development.s3.amazonaws.com/uploads/e6a0dff8-ef69-408c-a798-f2cb4565b2e0/enchanted_trail_8.jpg").into(mApartmentImageView); //change back to this>   Picasso.with(getActivity()).load(mImageURL).into(mApartmentImageView);
+        String debuggerChecker = "3";
+        //commenting out because like the setText stuff above seems you have to all your setting in onPostExecute
+            // Picasso.with(getActivity()).load(mImageURL).into(mApartmentImageView);
+
+
+
         //former Picasso code that worked to get a fixed URL from database to load
 //        String path = "http://roomloo-development.s3.amazonaws.com/uploads/e6a0dff8-ef69-408c-a798-f2cb4565b2e0/enchanted_trail_8.jpg";
 //        Picasso.with(getActivity()).load(path).into(mApartmentImageView);

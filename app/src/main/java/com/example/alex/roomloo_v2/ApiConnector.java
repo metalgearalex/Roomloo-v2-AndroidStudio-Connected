@@ -119,13 +119,13 @@ public class ApiConnector {
                 JSONArray apartmentImageArray = apartmentJsonObject.getJSONArray("apartment_images");
                 for (int j=0; j<=apartmentImageArray.length(); j++) {
                     try {
-                            JSONObject apartmentImageJsonObject = (JSONObject) apartmentImageArray.get(j);
+                        JSONObject apartmentImageJsonObject = apartmentImageArray.getJSONObject(j); //former code here: JSONObject apartmentImageJsonObject = (JSONObject) apartmentImageArray.get(j);
                         String apartmentImageURL = apartmentImageJsonObject.getString("image"); //getString returns the value mapped by the name
                         apartment.setApartmentImageURL(apartmentImageURL);
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
-                }//end of for loop
+                }//end of nested for loop
 
                 //apartmentJsonObject.getJSONArray("apartment_images").getJStoString();
 
