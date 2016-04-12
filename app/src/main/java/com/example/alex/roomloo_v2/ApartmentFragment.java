@@ -9,6 +9,7 @@ import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -156,6 +157,20 @@ public class ApartmentFragment extends Fragment {
         }
     }
 
+//generic instructions to allow insertion of pictures into a horizontalimageslider
+//method then used in GetApartmentTask in onPostExecute
+//from here: http://stackoverflow.com/questions/22990142/android-lazy-loading-image-in-horizontalscrollview-using-picasso
+
+    public View insertPhoto(String path){
+        LinearLayout layout = new LinearLayout(getActivity());
+        layout.setGravity(Gravity.CENTER);
+        ImageView imageView = new ImageView(getActivity());
+        imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
+        Picasso.with(getActivity() ).load(path).into(imageView);
+        layout.addView(imageView);
+        return layout;
+            }
+
     //to avoid a networkonmainthreaderror
     private class GetApartmentTask extends AsyncTask<ApiConnector,Long,Apartment > //JSONArray here specifies the type of result you'll be sending back to the main thread
     {
@@ -191,9 +206,15 @@ public class ApartmentFragment extends Fragment {
 
             //to get image URL from database to then use with Picasso to download the image
 
-            mImageURLArraylist = mApartment.getApartmentImageArrayList(); //does indeed have a value, which is the URL of the image from AWS
+            mImageURLArraylist = mApartment.getApartmentImageArrayList();
             for (int z = 0 ;z<mImageURLArraylist.size();z++) {
-            Picasso.with(getActivity()).load("http:" + mImageURLArraylist.get(z)).into(mApartmentImageView);
+            mLinearLayout.addView(insertPhoto("http:" + mImageURLArraylist.get(z)) );
+
+                //prior working code:
+                    //mImageURLArraylist = mApartment.getApartmentImageArrayList(); //does indeed have a value, which is the URL of the image from AWS
+                    //for (int z = 0 ;z<mImageURLArraylist.size();z++) {
+                    //Picasso.with(getActivity()).load("http:" + mImageURLArraylist.get(z)).into(mApartmentImageView);
+
                 } //end of for loop
 
 //            Picasso picasso = new Picasso.Builder(getContext())
@@ -294,6 +315,7 @@ public class ApartmentFragment extends Fragment {
         //prior code was just : >> mApartmentImageView = (ImageView) v.findViewById(R.id.details_page_apartment_picture);
 
         mLinearLayout = (LinearLayout) v.findViewById(R.id.details_page_apartment_picture);
+
 
         //the code below works to get a set link to work. NOTE THE http: without that this DOES NOT WORK
 //            Picasso.with(getActivity()).load("http://roomloo-development.s3.amazonaws.com/uploads/e6a0dff8-ef69-408c-a798-f2cb4565b2e0/enchanted_trail_7.jpg").into(mApartmentImageView); //change back to this>   Picasso.with(getActivity()).load(mImageURL).into(mApartmentImageView);

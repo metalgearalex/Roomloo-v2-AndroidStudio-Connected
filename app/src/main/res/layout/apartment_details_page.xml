@@ -28,7 +28,7 @@
     <HorizontalScrollView
         android:id="@+id/horizontal_scroll_view"
         android:layout_width="wrap_content"
-        android:layout_height="200dp">
+        android:layout_height="500dp">
 
         <LinearLayout
             android:id="@+id/details_page_apartment_picture"
@@ -50,7 +50,9 @@
         android:id="@+id/location_map"
         android:layout_width="match_parent"
         android:layout_height="250dp"
-        android:layout_below="@id/details_page_apartment_text"
-        class="com.google.android.gms.maps.SupportMapFragment" />
+        class="com.google.android.gms.maps.SupportMapFragment"
+        android:layout_alignBottom="@+id/horizontal_scroll_view"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true" />
 
 </RelativeLayout>
