@@ -14,6 +14,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -36,6 +37,8 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.squareup.picasso.Picasso;
 
+import java.util.ArrayList;
+
 /**
  * Created by Alex on 9/18/2015.
  */
@@ -44,8 +47,10 @@ public class ApartmentFragment extends Fragment {
     private Apartment mApartment;
     private static final String ARG_APARTMENT_ID = "apartment_id";
     private ImageView mApartmentImageView;
+    private LinearLayout mLinearLayout;
     private TextView mApartmentTextView;
-    private String mImageURL;
+    private ArrayList<String> mImageURLArraylist;
+
 
     private LoginButton mFbLoginButton;
     private CallbackManager mCallbackManager;
@@ -186,10 +191,10 @@ public class ApartmentFragment extends Fragment {
 
             //to get image URL from database to then use with Picasso to download the image
 
-            mImageURL = mApartment.getApartmentImageURL(); //does indeed have a value, which is the URL of the image from AWS
-            mApartment.setApartmentImageURL(mImageURL); //should be unnecessary and redudnant just doublechecking
-            Picasso.with(getActivity()).load("http:"+mImageURL).into(mApartmentImageView);
-
+            mImageURLArraylist = mApartment.getApartmentImageArrayList(); //does indeed have a value, which is the URL of the image from AWS
+            for (int z = 0 ;z<mImageURLArraylist.size();z++) {
+            Picasso.with(getActivity()).load("http:" + mImageURLArraylist.get(z)).into(mApartmentImageView);
+                } //end of for loop
 
 //            Picasso picasso = new Picasso.Builder(getContext())
 //                .listener(new Picasso.Listener() {
@@ -286,8 +291,10 @@ public class ApartmentFragment extends Fragment {
         //old way before API integration >> mApartmentTextView.setText(mApartment.getApartmentText() );
 
        //trying to get image from AWS to show up using Picasso
+        //prior code was just : >> mApartmentImageView = (ImageView) v.findViewById(R.id.details_page_apartment_picture);
 
-        mApartmentImageView = (ImageView) v.findViewById(R.id.details_page_apartment_picture);
+        mLinearLayout = (LinearLayout) v.findViewById(R.id.details_page_apartment_picture);
+
         //the code below works to get a set link to work. NOTE THE http: without that this DOES NOT WORK
 //            Picasso.with(getActivity()).load("http://roomloo-development.s3.amazonaws.com/uploads/e6a0dff8-ef69-408c-a798-f2cb4565b2e0/enchanted_trail_7.jpg").into(mApartmentImageView); //change back to this>   Picasso.with(getActivity()).load(mImageURL).into(mApartmentImageView);
 

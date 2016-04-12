@@ -24,6 +24,7 @@ import java.util.List;
 public class ApiConnector {
 
     private static final String TAG = "ApiConnector";
+    private ArrayList<String> mImageURLArraylist;
 
     //fetches raw data from a URL and returns it as an array of bytes
     public byte[] getUrlBytes (String urlSpec) throws IOException {
@@ -119,9 +120,12 @@ public class ApiConnector {
                 JSONArray apartmentImageArray = apartmentJsonObject.getJSONArray("apartment_images");
                 for (int j=0; j<=apartmentImageArray.length(); j++) {
                     try {
-                        JSONObject apartmentImageJsonObject = apartmentImageArray.getJSONObject(j); //former code here: JSONObject apartmentImageJsonObject = (JSONObject) apartmentImageArray.get(j);
+                        JSONObject apartmentImageJsonObject = apartmentImageArray.getJSONObject(j);
                         String apartmentImageURL = apartmentImageJsonObject.getString("image"); //getString returns the value mapped by the name
-                        apartment.setApartmentImageURL(apartmentImageURL);
+                        apartment.setApartmentImageArrayList(apartmentImageURL);
+                            //mImageURLArraylist.add(apartmentImageURL);
+                        String debugChecker = "3";
+                        //former code: apartment.setApartmentImageURL(apartmentImageURL);
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
@@ -215,8 +219,9 @@ public Apartment getApartment(int idInt) {
                     try {
                         JSONObject apartmentImageJsonObject = apartmentImageArray.getJSONObject(j);
                         String apartmentImageURL = apartmentImageJsonObject.getString("image");
-                        apartment.setApartmentImageURL(apartmentImageURL);
-                        String debugerCheckerFiller = "3";
+                        apartment.setApartmentImageArrayList(apartmentImageURL); //other option? > mImageURLArraylist.add(apartmentImageURL);
+                        //former code: apartment.setApartmentImageURL(apartmentImageURL);
+
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
