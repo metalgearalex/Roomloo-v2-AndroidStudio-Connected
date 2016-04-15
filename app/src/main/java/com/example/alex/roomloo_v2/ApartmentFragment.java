@@ -165,8 +165,8 @@ public class ApartmentFragment extends Fragment {
         LinearLayout layout = new LinearLayout(getActivity());
         layout.setGravity(Gravity.CENTER);
         ImageView imageView = new ImageView(getActivity());
-        imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
-        Picasso.with(getActivity() ).load(path).into(imageView);
+        imageView.setScaleType(ImageView.ScaleType.CENTER_INSIDE);
+        Picasso.with(getActivity() ).load(path).into(imageView); //tried this but got errors when running > resize(layout.getWidth(), layout.getHeight()), also tried .fit() after .load image wouldn't load
         layout.addView(imageView);
         return layout;
             }
@@ -207,8 +207,8 @@ public class ApartmentFragment extends Fragment {
             //to get image URL from database to then use with Picasso to download the image
 
             mImageURLArraylist = mApartment.getApartmentImageArrayList();
-            for (int z = 0 ;z<mImageURLArraylist.size();z++) {
-            mLinearLayout.addView(insertPhoto("http:" + mImageURLArraylist.get(z)) );
+            for (int z = 0 ;z<mImageURLArraylist.size(); z++) {
+                mLinearLayout.addView(insertPhoto("http:" + mImageURLArraylist.get(z)) );
 
                 //prior working code:
                     //mImageURLArraylist = mApartment.getApartmentImageArrayList(); //does indeed have a value, which is the URL of the image from AWS
