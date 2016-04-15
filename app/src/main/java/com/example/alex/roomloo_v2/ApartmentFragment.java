@@ -9,6 +9,10 @@ import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentStatePagerAdapter;
+import android.support.v4.view.PagerAdapter;
+import android.support.v4.view.ViewPager;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -47,7 +51,6 @@ public class ApartmentFragment extends Fragment {
 
     private Apartment mApartment;
     private static final String ARG_APARTMENT_ID = "apartment_id";
-    private ImageView mApartmentImageView;
     private LinearLayout mLinearLayout;
     private TextView mApartmentTextView;
     private ArrayList<String> mImageURLArraylist;
@@ -68,6 +71,16 @@ public class ApartmentFragment extends Fragment {
     private SupportMapFragment mSupportMapFragment;
 
     private static final String TAG = "Picasso";
+
+    /**The number of pages (wizard steps) to show in this demo.*/
+    private static final int NUM_PAGES = 5; //MAKE THIS DYNAMIC
+
+    /** The pager widget, which handles animation and allows swiping horizontally to access previous and next wizard steps. */
+    private ViewPager mPager;
+
+    /**The pager adapter, which provides the pages to the view pager widget.*/
+    private PagerAdapter mPagerAdapter;
+
 
     //to retrieve an extra (i.e. which apartment is this that we're showing?)
     //basically stashing the data(apartment's id) in its arguments bundle
@@ -122,6 +135,7 @@ public class ApartmentFragment extends Fragment {
         mAccessTokenTracker.startTracking();
         mProfileTracker.startTracking();
 
+
     }//end of onCreate
 
 
@@ -170,6 +184,26 @@ public class ApartmentFragment extends Fragment {
         layout.addView(imageView);
         return layout;
             }
+
+
+        /** A simple pager adapter that represents ScreenSlidePageFragment objects, in sequence. */
+        private class ScreenSlidePagerAdapter extends FragmentStatePagerAdapter {
+            public ScreenSlidePagerAdapter(FragmentManager fm) {
+                super(fm);
+                    }
+
+            @Override
+            public Fragment getItem(int position) { //getItem method supplies instances of your fragment as new pages
+                return new Fragment(); //this is probably wrong. this section is meant to supply new pages or slides. the tutorial does everything in an activity so your fragment is a page.
+                    }
+
+            @Override
+            public int getCount() {
+                return NUM_PAGES; //the number of pages the adapter will create. CHANGE THIS TO BE DYNAMIC
+                    }
+        }//end of ScreenSlidePagerAdapter
+
+
 
     //to avoid a networkonmainthreaderror
     private class GetApartmentTask extends AsyncTask<ApiConnector,Long,Apartment > //JSONArray here specifies the type of result you'll be sending back to the main thread
@@ -315,6 +349,12 @@ public class ApartmentFragment extends Fragment {
         //prior code was just : >> mApartmentImageView = (ImageView) v.findViewById(R.id.details_page_apartment_picture);
 
         mLinearLayout = (LinearLayout) v.findViewById(R.id.details_page_apartment_picture);
+
+
+        // Instantiate a ViewPager and a PagerAdapter.
+        mPager = (ViewPager) v.findViewById(R.id.horizontal_scroll_view);
+        mPagerAdapter = new ScreenSlidePagerAdapter(getActivity().getSupportFragmentManager() ); //getActivity added because otherwise getSupportFragmentManager "doesn't exist";   tutorial code: mPagerAdapter = new ScreenSlidePagerAdapter(getSupportFragmentManager() );
+        mPager.setAdapter(mPagerAdapter);
 
 
         //the code below works to get a set link to work. NOTE THE http: without that this DOES NOT WORK
