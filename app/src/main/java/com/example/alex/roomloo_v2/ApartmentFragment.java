@@ -10,8 +10,6 @@ import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.view.Gravity;
@@ -189,13 +187,10 @@ public class ApartmentFragment extends Fragment {
 
 
         /** A simple pager adapter that represents ScreenSlidePageFragment objects, in sequence. */
-        private class ScreenSlidePagerAdapter extends FragmentStatePagerAdapter { //changed from extends FragmentStatePagerAdapter because that requires getItem method which calls a fragment
+        private class ScreenSlidePagerAdapter extends PagerAdapter { //changed from extends FragmentStatePagerAdapter because that requires getItem method which calls a fragment
 
             //deleted the constructor, something along these lines but not quite the below
 
-            public ScreenSlidePagerAdapter(FragmentManager fm) {
-                super(fm);
-            }
 
             //create the page for the given position
             //one of four methods that you must override when using pageradapters
@@ -239,13 +234,6 @@ public class ApartmentFragment extends Fragment {
             @Override
             public void destroyItem (ViewGroup container, int position, Object object) {
                 container.removeView((LinearLayout) object); //cast as LinearLayout because this refers to the layout you're inflating in instantiateItem above, which in our case is horizontal_image_scroller , a linearlayout
-                    }
-
-
-
-                @Override
-            public Fragment getItem(int position) { //getItem method supplies instances of your fragment as new pages
-                return new HorizontalImageScrollerFragment(); //just returns R.layout.horizontal_image_scroller
                     }
 
         }//end of ScreenSlidePagerAdapter
@@ -292,7 +280,7 @@ public class ApartmentFragment extends Fragment {
             // Instantiate a ViewPager and a PagerAdapter.
             //moved this from onCreate to onPostExecute
 
-            mPagerAdapter = new ScreenSlidePagerAdapter(getActivity().getSupportFragmentManager() ); //getActivity added because otherwise getSupportFragmentManager "doesn't exist";   tutorial code: mPagerAdapter = new ScreenSlidePagerAdapter(getSupportFragmentManager() );
+            mPagerAdapter = new ScreenSlidePagerAdapter(); //getActivity added because otherwise getSupportFragmentManager "doesn't exist";   tutorial code: mPagerAdapter = new ScreenSlidePagerAdapter(getSupportFragmentManager() );
             mPager.setAdapter(mPagerAdapter);
             String DebugChecker = "3";
                 //prior working code:
