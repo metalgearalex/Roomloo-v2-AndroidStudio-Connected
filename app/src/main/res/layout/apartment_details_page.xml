@@ -25,9 +25,10 @@
         android:layout_toRightOf="@id/login_button"
         android:text="@string/schedule_viewing"/>
 
+
     <include
-        android:id="@+id/include_horizontal_image_scroller"
         layout = "@layout/horizontal_image_scroller"/>
+
 
 
     <TextView

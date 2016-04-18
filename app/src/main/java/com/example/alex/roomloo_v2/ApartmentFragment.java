@@ -180,17 +180,18 @@ public class ApartmentFragment extends Fragment {
         Picasso.with(getActivity() ).load(path).into(imageView); //tried this but got errors when running > resize(layout.getWidth(), layout.getHeight()), also tried .fit() after .load image wouldn't load
         layout.addView(imageView);
         return layout;
-            }
+    }
 
 
 
 
 
-        /** A simple pager adapter that represents ScreenSlidePageFragment objects, in sequence. */
+
+
+    /** A simple pager adapter that represents ScreenSlidePageFragment objects, in sequence. */
         private class ScreenSlidePagerAdapter extends PagerAdapter { //changed from extends FragmentStatePagerAdapter because that requires getItem method which calls a fragment
 
-            //deleted the constructor, something along these lines but not quite the below
-
+            public ScreenSlidePagerAdapter() {} //adding an empty constructor. no idea if its necessary or not
 
             //create the page for the given position
             //one of four methods that you must override when using pageradapters
@@ -199,7 +200,7 @@ public class ApartmentFragment extends Fragment {
                 LayoutInflater inflater = (LayoutInflater) container.getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE); //no idea what this really does
 
         //inflate the ViewPager
-                ViewGroup item_view = (ViewGroup) inflater.inflate(R.layout.horizontal_image_scroller, container, false);
+                ViewGroup item_view = (ViewGroup) inflater.inflate(R.layout.horizontal_image_scroller, container, false); //this may be wrong, tutorial does NOT inflate the xml with the viewpager widget but rather the normal/main xml file without hte viewpager. However, inflating the main one causes errors
 
                 //insertPhoto is of type View and takes parameter String
                 //insertPhoto ultimately creates a new LinearLayout, a new ImageView, uses Picasso to load the right imageURL / image
@@ -208,10 +209,11 @@ public class ApartmentFragment extends Fragment {
 
                 for (int z = 0; z < mImageURLArraylist.size(); z++) { //recall that mImageURLArraylist = mApartment.getApartmentImageArrayList();
                     container.addView(insertPhoto("http:" + mImageURLArraylist.get(z)));
+//                        container.addView(item_view); //test, prob delete
                     String debuggerChecker="3";
-                }//end of for loop
+                        }//end of for loop
                 return item_view; //move this outside the for loop?
-            }
+                        }
 
             //Determines whether a page View is associated with a specific key object as returned by
             //one of four methods that you must override when using pageradapters
@@ -224,9 +226,9 @@ public class ApartmentFragment extends Fragment {
             //one of four methods that you must override when using pageradapters
             @Override
             public int getCount() {
-                return 3;
+                //return 3;
                 //temporarily commenting out so it stops crashing and I can debug
-                    // return mImageURLArraylist.size(); //the number of pages the adapter will create.
+                return mImageURLArraylist.size(); //the number of pages the adapter will create.
                     }
 
             //one of four methods that you must override when using pageradapters
@@ -280,8 +282,10 @@ public class ApartmentFragment extends Fragment {
             // Instantiate a ViewPager and a PagerAdapter.
             //moved this from onCreate to onPostExecute
 
-            mPagerAdapter = new ScreenSlidePagerAdapter(); //getActivity added because otherwise getSupportFragmentManager "doesn't exist";   tutorial code: mPagerAdapter = new ScreenSlidePagerAdapter(getSupportFragmentManager() );
+            //getActivity added because otherwise getSupportFragmentManager "doesn't exist";   tutorial code: mPagerAdapter = new ScreenSlidePagerAdapter(getSupportFragmentManager() );
+            mPagerAdapter = new ScreenSlidePagerAdapter();
             mPager.setAdapter(mPagerAdapter);
+                //mPager.setCurrentItem(1); //just a test
             String DebugChecker = "3";
                 //prior working code:
                     //mImageURLArraylist = mApartment.getApartmentImageArrayList(); //does indeed have a value, which is the URL of the image from AWS
@@ -290,21 +294,6 @@ public class ApartmentFragment extends Fragment {
 
                 //} //end of for loop
 
-//            Picasso picasso = new Picasso.Builder(getContext())
-//                .listener(new Picasso.Listener() {
-//                    @Override
-//                    public void onImageLoadFailed(Picasso picasso, Uri uri, Exception exception) {
-//                        //Here your log
-//                            Log.e(TAG, "Failed to load image");
-//                    }//end of onImageLoadFailed
-//                })
-//                .build(); picasso.load("//roomloo-development.s3.amazonaws.com/uploads/e6a0dff8-ef69-408c-a798-f2cb4565b2e0/enchanted_trail_8.jpg").into(mApartmentImageView);
-
-//             //method 2 of Picasso > Picasso.with(getActivity()).load(mImageURL).into(mApartmentImageView);
-//            String errorChecker = "3";
-             //change back to this>   Picasso.with(getActivity()).load(mImageURL).into(mApartmentImageView);
-                //replacing the above with just the URL directly: "http://roomloo-development.s3.amazonaws.com/uploads/e6a0dff8-ef69-408c-a798-f2cb4565b2e0/enchanted_trail_8.jpg" makes it work
-            //doesn't seem to work with pic 7 tho? even tho with my browser it downloads it?
                 }
 
     } // end of GetApartmentTask method
@@ -389,13 +378,16 @@ public class ApartmentFragment extends Fragment {
 
             //View w = inflater.inflate(R.layout.horizontal_image_scroller, container, false);//created because i need a view reference to my horizontal image scroller xml file
         //actually you can reference an id of something inside an xml file you used "include" on as if it were just in the xml normally: http://stackoverflow.com/questions/4787008/how-to-access-button-inside-include-layout
-        mLinearLayout = (LinearLayout) v.findViewById(R.id.details_page_apartment_picture);
+        //commenting out
+// mLinearLayout = (LinearLayout) v.findViewById(R.id.details_page_apartment_picture);
 
         // Instantiate a ViewPager and a PagerAdapter.
-        //moved this from onCreate to onPostExecute
         mPager = (ViewPager) v.findViewById(R.id.horizontal_scroll_view);
-//        mPagerAdapter = new ScreenSlidePagerAdapter(getActivity().getSupportFragmentManager() ); //getActivity added because otherwise getSupportFragmentManager "doesn't exist";   tutorial code: mPagerAdapter = new ScreenSlidePagerAdapter(getSupportFragmentManager() );
-//        mPager.setAdapter(mPagerAdapter);
+
+        //moved this from onCreate to onPostExecute
+//      mPagerAdapter = new ScreenSlidePagerAdapter(); //getActivity added because otherwise getSupportFragmentManager "doesn't exist";   tutorial code: mPagerAdapter = new ScreenSlidePagerAdapter(getSupportFragmentManager() );
+//      mPager.setAdapter(mPagerAdapter);
+
 
 
 
