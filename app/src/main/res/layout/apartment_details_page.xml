@@ -26,8 +26,16 @@
         android:text="@string/schedule_viewing"/>
 
 
-    <include
-        layout = "@layout/horizontal_image_scroller"/>
+    <!-- testing out adding just the ViewPager in the main xml file so I can set the Viewpager with findViewByID in onCreate -->
+    <android.support.v4.view.ViewPager
+        android:id="@+id/horizontal_scroll_view"
+        android:layout_width="match_parent"
+        android:layout_height="500dp"
+        >
+    </android.support.v4.view.ViewPager>
+
+<!--    <include
+        layout = "@layout/horizontal_image_scroller"/> -->
 
 
 
