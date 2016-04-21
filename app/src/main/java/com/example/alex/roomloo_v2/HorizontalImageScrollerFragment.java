@@ -14,6 +14,7 @@ import java.util.ArrayList;
  */
 
 public class HorizontalImageScrollerFragment extends Fragment {
+    private static final String ARG_APARTMENT_ID = "apartment_id";
     private Apartment mApartment;
     private ArrayList<String> mImageURLArraylist;
     private static final String TAG = "mImageURLArrayList";
@@ -21,11 +22,12 @@ public class HorizontalImageScrollerFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         ViewGroup rootView = (ViewGroup) inflater.inflate(R.layout.images_to_show, container, false);
-        mImageURLArraylist = getImageURLArrayList(mApartment);
 
         for (int z = 0; z< mImageURLArraylist.size(); z++) { //formerly used int z = 0 etc etc. recall that mImageURLArraylist = mApartment.getApartmentImageArrayList();
 
-            ApartmentFragment apartmentFragment = new ApartmentFragment();
+            ApartmentFragment apartmentFragment = new ApartmentFragment(); //nullpointer here
+            apartmentFragment.new GetApartmentTask().execute();
+
             container.addView(apartmentFragment.insertPhoto("http:" + mImageURLArraylist.get(z))); //container.addView(insertPhoto("http:" + mImageURLArraylist.get(z)));
             String debuggerChecker="3";
                 }//end of for loop
@@ -33,10 +35,13 @@ public class HorizontalImageScrollerFragment extends Fragment {
         return rootView;
             } // end of onCreate View
 
-    public ArrayList<String> getImageURLArrayList(Apartment apartment) {
-        apartment = mApartment;
-        return apartment.getApartmentImageArrayList();
-            }
+    public ArrayList<String> getApartmentImageArrayList(ApartmentFragment apartmentFragment) {
+        apartmentFragment.new GetApartmentTask().execute();
+        return apartmentFragment.mIm
+    }
+
+
+
 
 }
 
