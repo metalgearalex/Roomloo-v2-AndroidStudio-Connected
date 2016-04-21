@@ -193,6 +193,8 @@ public class ApartmentFragment extends Fragment {
             public ScreenSlidePagerAdapter() {} //adding an empty constructor. no idea if its necessary or not
             String debuggerChecker="3";
             //create the page for the given position
+            //see pg 213 of the boook but specifically it tells the adapter to create an item view for a given position
+            //and add it to a container ViewGroup
             //one of four methods that you must override when using pageradapters
             //container = The containing View in which the page will be shown.
             @Override
@@ -203,9 +205,9 @@ public class ApartmentFragment extends Fragment {
                 RLayoutId = R.layout.images_to_show;
 
                 ViewGroup imageLayout = (ViewGroup) inflater.inflate(RLayoutId, null);
-                for (int z = 0; z < mImageURLArraylist.size(); z++) { //recall that mImageURLArraylist = mApartment.getApartmentImageArrayList();
+                for (position = 0; position < mImageURLArraylist.size(); position++) { //formerly used int z = 0 etc etc. recall that mImageURLArraylist = mApartment.getApartmentImageArrayList();
 
-                    ((ViewPager) container).addView(insertPhoto("http:" + mImageURLArraylist.get(z))); //container.addView(insertPhoto("http:" + mImageURLArraylist.get(z)));
+                    container.addView(insertPhoto("http:" + mImageURLArraylist.get(position))); //container.addView(insertPhoto("http:" + mImageURLArraylist.get(z)));
                     String debuggerChecker="3";
                         }//end of for loop
 
@@ -221,11 +223,16 @@ public class ApartmentFragment extends Fragment {
                         }//end of instantiateItem method
 
             //Determines whether a page View is associated with a specific key object as returned by
+            //see pg 213 of the book. once a view has been created by instantiate item, the ViewPager
+            //needs to know which item's view it is.
             //one of four methods that you must override when using pageradapters
             @Override
-                public boolean isViewFromObject (View view, Object o) {
-                    return true; //no idea if this should be true or not
-                    }
+                public boolean isViewFromObject (View view, Object o) { //Object parameter is received from instantiateItem(ViewGroup, int)
+                    return true;
+                    //return view == o; //this needs to be true in my case //working code > return true;
+                    //book does this //((Fragment) o).getView() == view;
+                //somehow return view == o; makes my images not appear again
+                            }
 
 
             //one of four methods that you must override when using pageradapters
