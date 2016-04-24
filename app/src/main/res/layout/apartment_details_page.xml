@@ -53,6 +53,7 @@
         class="com.google.android.gms.maps.SupportMapFragment"
 
         android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true" />
+        android:layout_alignParentStart="true"
+        android:layout_below="@+id/horizontal_scroll_view"/>
 
 </RelativeLayout>

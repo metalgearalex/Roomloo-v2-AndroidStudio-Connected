@@ -5,7 +5,6 @@
 package com.example.alex.roomloo_v2;
 
 
-import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -183,67 +182,66 @@ public class ApartmentFragment extends Fragment {
      }
 
 
-
-
-
-
     /** A simple pager adapter that represents ScreenSlidePageFragment objects, in sequence. */
-        private class ScreenSlidePagerAdapter extends PagerAdapter { //changed from extends FragmentStatePagerAdapter because that requires getItem method which calls a fragment
+    private class ScreenSlidePagerAdapter extends PagerAdapter { //changed from extends FragmentStatePagerAdapter because that requires getItem method which calls a fragment
 
-            public ScreenSlidePagerAdapter() {} //adding an empty constructor. no idea if its necessary or not
-            String debuggerChecker="3";
-            //create the page for the given position
-            //one of four methods that you must override when using pageradapters
-            //container = The containing View in which the page will be shown.
-            @Override
-            public Object instantiateItem (ViewGroup container, int position) {
-                LayoutInflater inflater = (LayoutInflater) container.getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE); //think this just creates an instance of LayoutInflater
+        public ScreenSlidePagerAdapter() {} //adding an empty constructor. no idea if its necessary or not
 
-                int RLayoutId;
-                RLayoutId = R.layout.images_to_show;
-
-                ViewGroup imageLayout = (ViewGroup) inflater.inflate(RLayoutId, null);
-                for (int z = 0; z < mImageURLArraylist.size(); z++) { //recall that mImageURLArraylist = mApartment.getApartmentImageArrayList();
-
-                    ((ViewPager) container).addView(insertPhoto("http:" + mImageURLArraylist.get(z))); //container.addView(insertPhoto("http:" + mImageURLArraylist.get(z)));
-                    String debuggerChecker="3";
-                        }//end of for loop
-
-                return imageLayout;
+        //create the page for the given position
+        //see pg 213 of the boook but specifically it tells the adapter to create an item view for a given position
+        //and add it to a container ViewGroup
+        //one of four methods that you must override when using pageradapters
+        //container = The containing View in which the page will be shown.
+        //@param position  The page position to be instantiated.
+        @Override
+        public Object instantiateItem (ViewGroup container, int position) {
+            final View page = insertPhoto("http:" + mImageURLArraylist.get(position) );
+            container.addView(page);
+            return page;
+                }
 
 
-//commenting out old approach                ViewGroup item_view = (ViewGroup) inflater.inflate(R.layout.apartment_details_page, container, false); //this may be wrong, tutorial does NOT inflate the xml with the viewpager widget but rather the normal/main xml file without hte viewpager. However, inflating the main one causes errors
+            //insertPhoto is of type View and takes parameter String
+            //insertPhoto ultimately creates a new LinearLayout, a new ImageView, uses Picasso to load the right imageURL / image
+            // into the imageView, and adds the imageView as a View to the LinearLayout
+            // before ultimately returning the new linear layoutreturns a new linearlayout with an imageView
+//        }//end of instantiateItem method
 
-                //insertPhoto is of type View and takes parameter String
-                //insertPhoto ultimately creates a new LinearLayout, a new ImageView, uses Picasso to load the right imageURL / image
-                // into the imageView, and adds the imageView as a View to the LinearLayout
-                // before ultimately returning the new linear layoutreturns a new linearlayout with an imageView
-                        }//end of instantiateItem method
+        //Determines whether a page View is associated with a specific key object as returned by
+        //see pg 213 of the book. once a view has been created by instantiate item, the ViewPager
+        //needs to know which item's view it is.
+                //so if ViewPager calls instantiateItem(ViewGroup, 5) and receives object A
+                    //then isViewFromObject(View, A) should return true if the View passed in is for item 5 and false otherwise
+        //one of four methods that you must override when using pageradapters
+        @Override
+        public boolean isViewFromObject (View view, Object obj) { //Object parameter is received from instantiateItem(ViewGroup, int)
+            return view == ( (View) obj);
+            //return view == ( (View) obj);
+            //working code for first image to show up:   return true;
+            //return view == o; //this needs to be true in my case //working code > return true;
+            //book does this //((Fragment) o).getView() == view;
+            //somehow return view == o; makes my images not appear again
+                }
 
-            //Determines whether a page View is associated with a specific key object as returned by
-            //one of four methods that you must override when using pageradapters
-            @Override
-                public boolean isViewFromObject (View view, Object o) {
-                    return true; //no idea if this should be true or not
-                    }
 
+        //one of four methods that you must override when using pageradapters
+        @Override
+        public int getCount() {
+            //return 3;
+            //temporarily commenting out so it stops crashing and I can debug
+            //tested in debugging and this has the correct size (2)
+            return mImageURLArraylist.size(); //the number of pages the adapter will create.
+                }
 
-            //one of four methods that you must override when using pageradapters
-            @Override
-            public int getCount() {
-                //return 3;
-                //temporarily commenting out so it stops crashing and I can debug
-                return mImageURLArraylist.size(); //the number of pages the adapter will create.
-                    }
+        //one of four methods that you must override when using pageradapters
+        //this one destroys the page / slide when you're no longer looking at it to free up memory etc
+        @Override
+        public void destroyItem (ViewGroup container, int position, Object object) {
+            container.removeView((LinearLayout) object); //cast as LinearLayout because this refers to the layout you're inflating in instantiateItem above, which in our case is horizontal_image_scroller , a linearlayout
+                }
 
-            //one of four methods that you must override when using pageradapters
-            //this one destroys the page / slide when you're no longer looking at it to free up memory etc
-            @Override
-            public void destroyItem (ViewGroup container, int position, Object object) {
-                container.removeView((LinearLayout) object); //cast as LinearLayout because this refers to the layout you're inflating in instantiateItem above, which in our case is horizontal_image_scroller , a linearlayout
-                    }
+    }//end of ScreenSlidePagerAdapter
 
-        }//end of ScreenSlidePagerAdapter
 
 
 
