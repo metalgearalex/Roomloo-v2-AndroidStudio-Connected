@@ -289,7 +289,6 @@ public class ApartmentFragment extends Fragment {
             mPagerAdapter = new ScreenSlidePagerAdapter();
             mPager.setAdapter(mPagerAdapter);
                 //mPager.setCurrentItem(1); //just a test
-            String DebugChecker = "3";
                 //prior working code:
                     //mImageURLArraylist = mApartment.getApartmentImageArrayList(); //does indeed have a value, which is the URL of the image from AWS
                     //for (int z = 0 ;z<mImageURLArraylist.size();z++) {
@@ -382,7 +381,7 @@ public class ApartmentFragment extends Fragment {
             //View w = inflater.inflate(R.layout.horizontal_image_scroller, container, false);//created because i need a view reference to my horizontal image scroller xml file
         //actually you can reference an id of something inside an xml file you used "include" on as if it were just in the xml normally: http://stackoverflow.com/questions/4787008/how-to-access-button-inside-include-layout
         //commenting out
-        mLinearLayout = (LinearLayout) v.findViewById(R.id.details_page_apartment_picture);
+        //mLinearLayout = (LinearLayout) v.findViewById(R.id.details_page_apartment_picture);
 
         // Instantiate a ViewPager and a PagerAdapter.
         mPager = (ViewPager) v.findViewById(R.id.horizontal_scroll_view); //old: mPager = (ViewPager) v.findViewById(R.id.horizontal_scroll_view);

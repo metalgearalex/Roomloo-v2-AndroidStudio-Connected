@@ -124,7 +124,6 @@ public class ApiConnector {
                         String apartmentImageURL = apartmentImageJsonObject.getString("image"); //getString returns the value mapped by the name
                         apartment.setApartmentImageArrayList(apartmentImageURL);
                             //mImageURLArraylist.add(apartmentImageURL);
-                        String debugChecker = "3";
                         //former code: apartment.setApartmentImageURL(apartmentImageURL);
                     } catch (JSONException e) {
                         e.printStackTrace();
